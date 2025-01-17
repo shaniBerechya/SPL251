@@ -11,7 +11,7 @@ public class StompMessageEncoderDecoder implements MessageEncoderDecoder<StompFr
     private byte[] bytes = new byte[1 << 10]; //start with 1k
     private int len = 0;
 
-    private StompFrame  frame = new StompFrame(); // noy sure if evry time we need to erase the StompFrame
+    /*private StompFrame  frame = new StompFrame(); // noy sure if evry time we need to erase the StompFrame
     boolean toResat = false;
     
     //Section in the StompFrame
@@ -20,48 +20,51 @@ public class StompMessageEncoderDecoder implements MessageEncoderDecoder<StompFr
         HEADERS,
         FRAME_BODY
     }
-    private Stage stage = Stage.COMMAND; // the freme start with COMMAND
+    private Stage stage = Stage.COMMAND; // the freme start with COMMAND 
+    */
 
     /********************************************* Methods *****************************************************/
 
     @Override
     public StompFrame decodeNextByte(byte nextByte) {
-        //Cleaning the StompFrame for new frame
-        if(toResat){
-            this.frame = new StompFrame();
+        if(nextByte == '\u0000'){
+            String rawFrame = popString();
+            return parseStompFrame(rawFrame);
         }
-
-        //Frame decoding logic:
-        if(stage == Stage.COMMAND){
-            if(nextByte == '\n'){
-                frame.setCommend(popString());
-                stage = Stage.HEADERS; //moving to the next section
-            }
-            pushByte(nextByte);
-            return null; //not a frame yet
-        }
-        else if(stage == Stage.HEADERS){
-            if(nextByte == '\n' && len > 0){ //this condition check the we have a header to add
-                frame.setHeaders(popString());
-            }
-            else if (nextByte == '\n' && len == 0) { //the HEADERS section is over
-                stage =  Stage.FRAME_BODY; //moving to the next section
-            }
-            pushByte(nextByte);
-            return null; //not a frame yet
-        }
-        else if(stage == Stage.FRAME_BODY){
-            if(nextByte == '\u0000'){
-                frame.setFrameBody(popString());
-                toResat = true; //A flage to indicates that we need to reSet the frame
-                return frame;
-            }
-            pushByte(nextByte);
-            return null ; //not a frame yet
-        }
-        return null;
+        pushByte(nextByte);
+        return null; //not a frame yet
 
     }
+
+    public StompFrame parseStompFrame(String rawFrame) {
+        StompFrame frame = new StompFrame();
+        // Split the raw frame into header/command part and body part at the first occurrence of two newlines
+        String[] parts = rawFrame.split("\n\n", 2); 
+        String headersAndCommand = parts[0];
+        String body = null;
+        // Check if there is a body part after the double newline
+        if(parts.length > 1 && parts[1] != null && parts[1].length() >= 1) {
+            body = parts[1];
+        }
+    
+        // Split the headers and command part into separate lines
+        String[] lines = headersAndCommand.split("\n");
+        frame.setCommend(lines[0]); // The first line is always the command
+    
+        // Process each header line
+        for (int i = 1; i < lines.length; i++) {
+            frame.setHeaders(lines[i]); // Add each header to the frame
+        }
+    
+        // Set the body of the frame, trimming any leading/trailing whitespace
+        if (body != null) {
+            frame.setFrameBody(body.trim());
+        }
+    
+        return frame;
+    }
+    
+    
 
     @Override
     public byte[] encode(StompFrame frame) {
@@ -84,8 +87,7 @@ public class StompMessageEncoderDecoder implements MessageEncoderDecoder<StompFr
         }
 
         bytes[len++] = nextByte;
-    }
-
-    
-    
+    } 
 }
+    
+

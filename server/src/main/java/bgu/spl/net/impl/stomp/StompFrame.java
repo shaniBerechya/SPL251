@@ -40,7 +40,7 @@ public class StompFrame {
         this.frameBody = frameBody;
     }
 
-    //Getera
+    //Geters
 
     public String getCommend(){
         return commend;
@@ -64,7 +64,9 @@ public class StompFrame {
             builder.append(header.getKey()).append(" : ").append(header.getValue()).append("\n");
         }
         //FrameBody
-        builder.append("\n").append(frameBody).append("\n");
+        if(frameBody != null){
+            builder.append("\n").append(frameBody).append("\n");
+        }
         
         return builder.toString();
     }

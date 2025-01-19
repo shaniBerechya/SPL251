@@ -70,7 +70,7 @@ public class StompMessagingProtocolImpl implements StompMessagingProtocol<StompF
     *        If a client is not subscribed to a topic, it is not allowed to send messages to it.
     *        The {@link StompFrame.FrameBody} should not be null.
     *
-    * @return a 'RECEIPT' message if the massege was successful ?????????,
+    * @return a 'MESSAGE' message if the massege was successful contianig the bodyFrame of 'SEND'.
     *         or an 'ERROR' if the server cannot process the frame for any reason
     *         (e.g., invalid topic, missing subscription, etc.).
     */

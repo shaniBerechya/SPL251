@@ -36,6 +36,10 @@ public class StompFrame {
         headers.put(headerName,headerValue);
     }
 
+    public void setHeadersByPart (String headerName,String headerValue){
+        headers.put(headerName,headerValue);
+    }
+
     public void setFrameBody(String frameBody){
         this.frameBody = frameBody;
     }

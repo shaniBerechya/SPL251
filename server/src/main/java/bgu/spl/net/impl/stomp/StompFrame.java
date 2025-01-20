@@ -22,6 +22,14 @@ public class StompFrame {
         this(null,new HashMap<>() ,null);
     }
 
+    public StompFrame(String commend){
+        this(commend,new HashMap<>() ,null);
+    }
+
+    public StompFrame(String commend, String[] headers,String frameBody){
+        this(commend,new HashMap<>() ,frameBody);
+        setMultyHeaders(headers);
+    }
     /********************************************* Methods *****************************************************/
     //Seters:
 
@@ -34,6 +42,12 @@ public class StompFrame {
         String headerName = parts[0].trim();
         String headerValue = parts[1].trim();
         headers.put(headerName,headerValue);
+    }
+
+    public void setMultyHeaders (String[] complitHeaders){
+        for(String complitHeader: complitHeaders){
+            setHeaders(complitHeader);
+        }
     }
 
     public void setHeadersByPart (String headerName,String headerValue){

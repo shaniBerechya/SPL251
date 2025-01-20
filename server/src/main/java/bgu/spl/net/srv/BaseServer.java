@@ -47,7 +47,7 @@ public abstract class BaseServer<T> implements Server<T> {
                         clientSock,
                         encdecFactory.get(),
                         protocolFactory.get());
-
+                //maintain the connections database
                 connections.addConnectionHandler(connectionsIdCuonter, handler);
                 connectionsIdCuonter++;
                 execute(handler);

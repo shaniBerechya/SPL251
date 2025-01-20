@@ -5,7 +5,7 @@ import bgu.spl.net.srv.Connections;
 
 public class StompMessagingProtocolImpl implements StompMessagingProtocol<StompFrame> {
     private StompDataBase dataBase;  
-    private Connections connections;
+    private Connections<StompFrame> connections;
     private int connectionId;
     private boolean isTerminate;
 
@@ -20,7 +20,6 @@ public class StompMessagingProtocolImpl implements StompMessagingProtocol<StompF
         this.connectionId = connectionId;
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     public void process(StompFrame message) {
         String commend = message.getCommend();

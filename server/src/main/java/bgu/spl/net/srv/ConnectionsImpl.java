@@ -6,7 +6,6 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 import bgu.spl.net.impl.stomp.StompDataBase;
-import bgu.spl.net.impl.stomp.StompFrame;
 
 public class ConnectionsImpl<T> implements Connections<T>{
     private StompDataBase database;

@@ -22,14 +22,14 @@ public interface Server<T> extends Closeable {
      * @param <T> The Message Object for the protocol
      * @return A new Thread per client server
      */
-    public static BaseServer  threadPerClient(
+    public static <T> Server<T> threadPerClient(
             int port,
-            Supplier<MessagingProtocol<StompFrame> > protocolFactory,
-            Supplier<MessageEncoderDecoder<StompFrame> > encoderDecoderFactory) {
+            Supplier<MessagingProtocol<T>> protocolFactory,
+            Supplier<MessageEncoderDecoder<T> > encoderDecoderFactory) {
 
-        return new BaseServer(port, protocolFactory, encoderDecoderFactory) {
+        return new BaseServer<T>(port, protocolFactory, encoderDecoderFactory) {
             @Override
-            protected void execute(BlockingConnectionHandler  handler) {
+            protected void execute(BlockingConnectionHandler<T> handler) {
                 new Thread(handler).start();
             }
         };

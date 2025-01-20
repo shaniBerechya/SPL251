@@ -108,6 +108,7 @@ public class Reactor<T> implements Server<T> {
                 protocolFactory.get(),
                 clientChan,
                 this);
+        //Maintain the connections database
         connections.addConnectionHandler(connectionsIdCuonter, handler);
         connectionsIdCuonter++;
         clientChan.register(selector, SelectionKey.OP_READ, handler);

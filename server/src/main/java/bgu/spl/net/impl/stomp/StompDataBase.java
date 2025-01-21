@@ -95,10 +95,11 @@ public class StompDataBase {
         
         //remove the connectionID from all the channels which it subscribe to:
         Map<Integer, String> userChannels = subscriptionsDetails.get(connectionID);
-        for (String channel : userChannels.values()) {
-            channels.get(channel).remove(connectionID);
+        if (userChannels != null){
+            for (String channel : userChannels.values()) {
+                channels.get(channel).remove(connectionID);
+            }
         }
-
         //remone the connectionID from subscriptionsDetails:
         subscriptionsDetails.remove(connectionID);
 
@@ -225,6 +226,7 @@ public class StompDataBase {
         return channels.get(channel);
     }
 
+    @SuppressWarnings("unlikely-arg-type")
     public boolean getConnectedUsers(int connectionId){
         return  connectedUsers.contains(connectedUsers);
     }

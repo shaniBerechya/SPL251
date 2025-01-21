@@ -29,8 +29,10 @@ public class ConnectionsImpl<T> implements Connections<T>{
     @Override
     public void send(String channel, T msg) {
         Set<Integer> subToChannel = database.getSubscribers(channel);
-        for (Integer subConnectionId : subToChannel){
-            send(subConnectionId,msg);
+        if (subToChannel != null){
+            for (Integer subConnectionId : subToChannel){
+                send(subConnectionId,msg);
+            }
         }
     }
 

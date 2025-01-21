@@ -48,6 +48,7 @@ public class StompMessagingProtocolImpl implements StompMessagingProtocol<StompF
             String channel = respond.getHeaderValue("destination");
             connections.send(channel, respond);
         }
+        
         else if(commend.equals("SUBSCRIBE")){
             StompFrame respond = subscribeHendel(message);
             connections.send(connectionId, respond);
@@ -166,7 +167,7 @@ public class StompMessagingProtocolImpl implements StompMessagingProtocol<StompF
     *         or an 'ERROR' if the server cannot process the frame for any reason
     *         (e.g., invalid topic, missing subscription, etc.).
     */
-    private StompFrame sendHendel(StompFrame inputFrame){
+    public StompFrame sendHendel(StompFrame inputFrame){
         // Extract necessary headers
         String destination = inputFrame.getHeaderValue("destination");
         String receipt = inputFrame.getHeaderValue("receipt"); //can be null
@@ -198,7 +199,7 @@ public class StompMessagingProtocolImpl implements StompMessagingProtocol<StompF
         int messageID  = dataBase.addMessage(frameBody); //adds the message to the data base
         int subscriptionID = dataBase.getSubscriptionIDForChannel(destination, connectionId);
 
-        String[] headers = {"subscription : " + subscriptionID,"message-id : " + messageID,"destination" + destination};
+        String[] headers = {"subscription : " + subscriptionID,"message-id : " + messageID,"destination : " + destination};
         StompFrame respond = new StompFrame("MESSAGE", headers, frameBody);
         return respond;
     }
@@ -211,7 +212,7 @@ public class StompMessagingProtocolImpl implements StompMessagingProtocol<StompF
     * @return a 'RECEIPT' message if the massege was successful,
     *         or an 'ERROR' if the server cannot process the frame for any reason
     */
-    private StompFrame subscribeHendel(StompFrame inputFrame){
+    public StompFrame subscribeHendel(StompFrame inputFrame){
         // Extract necessary headers
         String destination = inputFrame.getHeaderValue("destination");
         String id = inputFrame.getHeaderValue("id");
@@ -301,7 +302,7 @@ public class StompMessagingProtocolImpl implements StompMessagingProtocol<StompF
     * @return a 'RECEIPT' message with the receipt-id header sent by the client,
     *         or an 'ERROR' if the server cannot process the frame for any reason
     */
-    private StompFrame disconnectHendel(StompFrame inputFrame){
+    public StompFrame disconnectHendel(StompFrame inputFrame){
        // Extract necessary headers
        String receipt = inputFrame.getHeaderValue("receipt"); 
        

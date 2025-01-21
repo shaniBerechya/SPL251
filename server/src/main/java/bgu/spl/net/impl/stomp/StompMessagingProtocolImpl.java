@@ -99,7 +99,7 @@ public class StompMessagingProtocolImpl implements StompMessagingProtocol<StompF
     *         or an 'ERROR' message explaining what went wrong.
     */
 
-    private StompFrame connectHendel(StompFrame inputFrame){
+    public StompFrame connectHendel(StompFrame inputFrame){
          // Extract necessary headers
         String version = inputFrame.getHeaderValue("accept-version");
         String host = inputFrame.getHeaderValue("host");
@@ -114,11 +114,11 @@ public class StompMessagingProtocolImpl implements StompMessagingProtocol<StompF
                 "should contain the following headers : 'accept-version', 'host', 'login', 'passcode'.");
            
         }
-        if (!"1.2".equals(version) || !"stomp.cs.bgu.ac.il".equals(host)) {
+        if (!"1.2".equals(version) ) {
             return erorGenretor(inputFrame,
-                "Unsupported version or host",
+                "Unsupported version",
                 null,
-                "Expected version 1.2 and host stomp.cs.bgu.ac.il");
+                "Expected version 1.2 ");
         }
 
         // Check if the user is already logged in
@@ -146,7 +146,7 @@ public class StompMessagingProtocolImpl implements StompMessagingProtocol<StompF
             } 
 
             // Wrong password
-            else {
+        else {
                 return erorGenretor(inputFrame,
                     "Wrong password",
                     null,

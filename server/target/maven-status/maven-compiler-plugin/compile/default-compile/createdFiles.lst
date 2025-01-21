@@ -4,7 +4,6 @@ bgu/spl/net/api/MessageEncoderDecoder.class
 bgu/spl/net/srv/Connections.class
 bgu/spl/net/impl/stomp/StompDataBase$SingletonHolder.class
 bgu/spl/net/api/MessagingProtocol.class
-bgu/spl/net/impl/stomp/main.class
 bgu/spl/net/impl/stomp/StompMessageEncoderDecoder.class
 bgu/spl/net/impl/stomp/StompDataBase.class
 bgu/spl/net/impl/stomp/StompMessagingProtocolImpl.class

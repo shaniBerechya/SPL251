@@ -49,6 +49,7 @@ public abstract class BaseServer<T> implements Server<T> {
                         protocolFactory.get());
                 //Maintain the connections database
                 connections.addConnectionHandler(connectionsIdCuonter, handler);
+                handler.getProtocol().start(connectionsIdCuonter, this.connections);
                 connectionsIdCuonter++;
                 execute(handler);
             }

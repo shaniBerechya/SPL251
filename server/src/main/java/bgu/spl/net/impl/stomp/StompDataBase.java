@@ -3,6 +3,8 @@ package bgu.spl.net.impl.stomp;
 import java.util.*;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.locks.ReadWriteLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 /**
  * Singleton class for managing users, channels, and messages in a STOMP protocol implementation.
@@ -15,6 +17,9 @@ public class StompDataBase {
     private Map<Integer, String> messages; // Maps message IDs to message contents
     private AtomicInteger messageIDCounter; // Counter for generating unique message IDs
     private Set<Integer> connectedUsers; // Set of currently connected usernames
+
+    private final ReadWriteLock databaseRWLock;
+
 
     private static class SingletonHolder {
         private static final StompDataBase instance = new StompDataBase();
@@ -31,6 +36,8 @@ public class StompDataBase {
         messages = new ConcurrentHashMap<>();
         messageIDCounter = new AtomicInteger(0);
         connectedUsers = ConcurrentHashMap.newKeySet();
+        databaseRWLock = new ReentrantReadWriteLock();
+        
     }
 
     /**
@@ -39,6 +46,7 @@ public class StompDataBase {
      * @return true if the user is connected, false otherwise.
      */
     public boolean isConnectedUser(Integer connectionID) {
+
         return connectedUsers.contains(connectionID);
     }
 
@@ -48,7 +56,10 @@ public class StompDataBase {
      * @return The password, or null if no such user exists.
      */
     public String getPasswordForUser(String username) {
-        return usersPasswords.get(username);
+        databaseRWLock.readLock().lock();    
+        String password = usersPasswords.get(username);
+        databaseRWLock.readLock().unlock();
+        return password;
     }
 
     /**
@@ -57,8 +68,10 @@ public class StompDataBase {
      * @param password The password of the user.
      */
     public void addOrUpdateUser(String username, String password,Integer connectionID ) {
+        databaseRWLock.writeLock().lock();    
         usersPasswords.put(username, password);
         connectedUsers.add(connectionID);
+        databaseRWLock.writeLock().unlock();   
     }
 
     /**
@@ -66,7 +79,9 @@ public class StompDataBase {
      * @param connectionID The connectionID of the user.
      */
     public void setNewConnected(Integer connectionID ) {
+        databaseRWLock.writeLock().lock();    
         connectedUsers.add(connectionID);
+        databaseRWLock.writeLock().unlock();
     }
 
     /**
@@ -74,6 +89,8 @@ public class StompDataBase {
      * @param connectionID The connectionID to disconnect.
      */
     public void disconnect(Integer connectionID) {
+        databaseRWLock.writeLock().lock();  
+        
         connectedUsers.remove(connectionID);
         
         //remove the connectionID from all the channels which it subscribe to:
@@ -85,6 +102,8 @@ public class StompDataBase {
         //remone the connectionID from subscriptionsDetails:
         subscriptionsDetails.remove(connectionID);
 
+        databaseRWLock.writeLock().unlock();
+
     }
 
     /**
@@ -94,7 +113,11 @@ public class StompDataBase {
      * @return true if the connection ID is subscribed, false otherwise.
      */
     public boolean isSubscribersForChannel(Integer connectionID, String channel) {
-        return getSubscriptionIDForChannel(channel, connectionID) != -1;
+        databaseRWLock.readLock().lock();
+        boolean isSubscribersForChannel =  getSubscriptionIDForChannel(channel, connectionID) != -1;
+        databaseRWLock.readLock().unlock();
+        return isSubscribersForChannel;
+
     }
 
     /**
@@ -104,14 +127,18 @@ public class StompDataBase {
      * @return The subscription ID, or -1 if no such subscription exists.
      */
     public int getSubscriptionIDForChannel(String channel, Integer connectionID) {
+        databaseRWLock.readLock().lock();
         Map<Integer, String> userChannels = subscriptionsDetails.get(connectionID);
         // Searches for a specific channel in the userChannels map and returns the corresponding connection ID
+        int subID = -1;
         for (Map.Entry<Integer, String> entry : userChannels.entrySet()) {
             if(entry.getValue().equals(channel)){
-                return entry.getKey();
+                subID = entry.getKey();
+                break;
             }
         }
-        return -1;
+        databaseRWLock.readLock().unlock();
+        return subID;
     }
 
     /**
@@ -121,12 +148,15 @@ public class StompDataBase {
      * @param subID The subscription ID associated with this subscription.
      */
     public void addChannelSubscription(String channel, Integer connectionID, Integer subID) {
+        databaseRWLock.writeLock().lock();
+
         // Ensure the channel exists in the map and associate it with a new HashSet if it's being referenced for the first time. Then add the connection ID to the set of IDs subscribed to this channel.
         channels.computeIfAbsent(channel, k -> new HashSet<>()).add(connectionID);
 
         // Ensure the connection ID exists in the map and associate it with a new HashMap if it's being referenced for the first time. Then map the subscription ID to the channel for this connection ID.
         subscriptionsDetails.computeIfAbsent(connectionID, k -> new HashMap<>()).put(subID, channel);
 
+        databaseRWLock.writeLock().unlock();
     }
 
     /**
@@ -135,8 +165,10 @@ public class StompDataBase {
      * @param connectionID The connection ID to remove.
      */
     public void removeChannelSubscription(String channel, Integer connectionID, Integer subID) {
+        databaseRWLock.writeLock().lock();
         channels.get(channel).remove(connectionID);
         subscriptionsDetails.get(connectionID).remove(subID);
+        databaseRWLock.writeLock().unlock();
 
     }
 
@@ -146,13 +178,17 @@ public class StompDataBase {
      * @return true if valid, false otherwise.
      */
     public boolean isValidID(Integer id,Integer connectionID ) {
+        databaseRWLock.readLock().lock();
         Map<Integer, String> userChannels = subscriptionsDetails.get(connectionID);
+        boolean isValidID = false;
         for (Map.Entry<Integer, String> entry : userChannels.entrySet()) {
             if(entry.getKey().equals(id)){
-                return true;
+                isValidID = true;
+                break;
             }
         }
-        return false;
+        databaseRWLock.readLock().unlock();
+        return isValidID;
     }
 
     /**
@@ -161,8 +197,10 @@ public class StompDataBase {
      * @return The unique ID assigned to the new message.
      */
     public int addMessage(String message){
+        databaseRWLock.writeLock().lock();
         int id = messageIDCounter.incrementAndGet();
         messages.put(id, message);
+        databaseRWLock.writeLock().unlock();
         return id;
     }
 

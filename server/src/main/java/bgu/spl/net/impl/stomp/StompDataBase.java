@@ -129,14 +129,18 @@ public class StompDataBase {
     public int getSubscriptionIDForChannel(String channel, Integer connectionID) {
         databaseRWLock.readLock().lock();
         Map<Integer, String> userChannels = subscriptionsDetails.get(connectionID);
-        // Searches for a specific channel in the userChannels map and returns the corresponding connection ID
         int subID = -1;
-        for (Map.Entry<Integer, String> entry : userChannels.entrySet()) {
-            if(entry.getValue().equals(channel)){
-                subID = entry.getKey();
-                break;
+        //if the userChannels is null that means the the user is not sub to anything 
+        if(userChannels != null){
+            // Searches for a specific channel in the userChannels map and returns the corresponding connection ID
+            for (Map.Entry<Integer, String> entry : userChannels.entrySet()) {
+                if(entry.getValue().equals(channel)){
+                    subID = entry.getKey();
+                    break;
+                }
             }
         }
+        
         databaseRWLock.readLock().unlock();
         return subID;
     }

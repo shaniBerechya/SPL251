@@ -120,4 +120,9 @@ public class NonBlockingConnectionHandler<T> implements ConnectionHandler<T> {
             reactor.updateInterestedOps(chan, SelectionKey.OP_READ | SelectionKey.OP_WRITE);
         }
     }
+
+    public MessagingProtocol<T> getProtocol(){
+        return protocol;
+
+    }
 }

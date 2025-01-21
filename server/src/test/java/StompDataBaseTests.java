@@ -43,6 +43,19 @@ import java.util.Map;
         assertEquals(db.getPasswordForUser("meni"), "films");
 
         }
+        @Test
+        public void testConnectHendeError1(){
+            StompMessagingProtocolImpl protocol = new StompMessagingProtocolImpl();
+        
+            StompFrame connectFrame = new StompFrame("CONNECT");
+            connectFrame.setHeadersByPart("accept-version", "1.2");
+            connectFrame.setHeadersByPart("host", "stomp.cs.bgu.ac.il");
+            connectFrame.setHeadersByPart("login", "meni");
+            connectFrame.setHeadersByPart("passcode", "films");
+    
+            StompFrame respond = protocol.connectHendel(connectFrame);
+      
+        }
         
     
 }

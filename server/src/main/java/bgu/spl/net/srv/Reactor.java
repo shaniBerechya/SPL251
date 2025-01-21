@@ -101,7 +101,9 @@ public class Reactor<T> implements Server<T> {
 
 
     private void handleAccept(ServerSocketChannel serverChan, Selector selector) throws IOException {
+        System.out.println("before accept");
         SocketChannel clientChan = serverChan.accept();
+        System.out.println("client connected");
         clientChan.configureBlocking(false);
         final NonBlockingConnectionHandler<T> handler = new NonBlockingConnectionHandler<>(
                 readerFactory.get(),
@@ -110,6 +112,7 @@ public class Reactor<T> implements Server<T> {
                 this);
         //Maintain the connections database
         connections.addConnectionHandler(connectionsIdCuonter, handler);
+        handler.getProtocol().start(connectionsIdCuonter, this.connections);
         connectionsIdCuonter++;
         clientChan.register(selector, SelectionKey.OP_READ, handler);
     }

@@ -2,7 +2,6 @@
 /workspaces/SPL251/server/src/main/java/bgu/spl/net/srv/ConnectionHandler.java
 /workspaces/SPL251/server/src/main/java/bgu/spl/net/impl/stomp/StompFrame.java
 /workspaces/SPL251/server/src/main/java/bgu/spl/net/impl/stomp/StompMessagingProtocolImpl.java
-/workspaces/SPL251/server/src/main/java/bgu/spl/net/impl/stomp/main.java
 /workspaces/SPL251/server/src/main/java/bgu/spl/net/srv/BlockingConnectionHandler.java
 /workspaces/SPL251/server/src/main/java/bgu/spl/net/srv/Reactor.java
 /workspaces/SPL251/server/src/main/java/bgu/spl/net/srv/Connections.java

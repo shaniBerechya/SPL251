@@ -1,38 +1,32 @@
 package bgu.spl.net.impl.stomp;
 
+import bgu.spl.net.api.MessageEncoderDecoder;
 import bgu.spl.net.srv.Server;
 
 public class StompServer {
-
     public static void main(String[] args) {
-        //Sapty Chack for args
-        System.out.println("args: "+ args.toString() );
-        if(args.length != 2){
-            System.out.println("args dosent contein port and server type");
+        int port = Integer.parseInt(args[0]);
+        String mode = args[1];
+        if (mode.equals("tpc")){
+            Server.<StompFrame>threadPerClient(
+                port,
+                StompMessagingProtocolImpl::new, // Factory for the protocol
+                StompMessageEncoderDecoder::new // Factory for the encoder/decoder
+            ).serve();
         }
-        /*
-        else if (args[1] != "reactor" && args[1] != "tpc") {
-            System.out.println("server type should be : <reactor / tpc>");
-        }*/
+
+        else if(mode.equals("reactor")){
+            Server.<StompFrame>reactor(
+            Runtime.getRuntime().availableProcessors(), //העתקתי מהecoServer
+            port,
+            StompMessagingProtocolImpl::new, // Factory for the protocol
+            StompMessageEncoderDecoder::new // Factory for the encoder/decoder
+            ).serve();
+        }
         else{
-            int port = Integer.valueOf(args[0]); //geting the port from args
-            //case 1: tpc
-            if (args[1].equals("tpc")){
-                Server.threadPerClient(
-                    port,
-                    StompMessagingProtocolImpl::new, //protocol factory,
-                    StompMessageEncoderDecoder::new)//message encoder decoder factory)
-                    .serve(); 
-            }
-            //case 2: reactor
-            else if (args[1].equals("reactor")){
-                Server.reactor(
-                    port,
-                    Runtime.getRuntime().availableProcessors(),
-                    () -> new StompMessagingProtocolImpl(), //protocol factory,
-                    () -> new StompMessageEncoderDecoder())//message encoder decoder factory
-                    .serve();
-            }
+            // טיפול במקרה שהמצב שהועבר לא תקין
+            System.err.println("Invalid mode: " + mode);
+            System.err.println("Supported modes are: tpc, reactor");
         }
     }
 }

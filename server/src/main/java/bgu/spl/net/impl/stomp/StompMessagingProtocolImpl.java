@@ -321,7 +321,7 @@ public class StompMessagingProtocolImpl implements StompMessagingProtocol<StompF
         }
         //Disconnect logic:
         dataBase.disconnect(connectionId);
-        return new StompFrame("RECEIPT", new String[] {"receipt - id : "+ receipt } , null);
+        return new StompFrame("RECEIPT", new String[] {"receipt-id:"+ receipt } , null);
     }
 
     /********************************************* Other Mthods *******************************************************************/

@@ -155,8 +155,16 @@ public class StompDataBase {
     public void addChannelSubscription(String channel, Integer connectionID, Integer subID) {
         databaseRWLock.writeLock().lock();
 
-        // Ensure the channel exists in the map and associate it with a new HashSet if it's being referenced for the first time. Then add the connection ID to the set of IDs subscribed to this channel.
-        channels.computeIfAbsent(channel, k -> new HashSet<>()).add(connectionID);
+        // Ensure the channel exists in the map and associate it with a new HashSet if it's being referenced for the first time.
+        // Then add the connection ID to the set of IDs subscribed to this channel.
+        if(channels.get(channel) != null){
+            channels.get(channel).add(connectionID);
+        }
+        else{
+            Set<Integer> subToChannel = new HashSet<>();
+            subToChannel.add(connectionID);
+            channels.put(channel, subToChannel);
+        }
 
         // Ensure the connection ID exists in the map and associate it with a new HashMap if it's being referenced for the first time. Then map the subscription ID to the channel for this connection ID.
         subscriptionsDetails.computeIfAbsent(connectionID, k -> new HashMap<>()).put(subID, channel);
@@ -223,6 +231,7 @@ public class StompDataBase {
     }
 
     public Set<Integer> getSubscribers(String channel){
+        System.out.println("channels is null: " + channels == null);
         return channels.get(channel);
     }
 

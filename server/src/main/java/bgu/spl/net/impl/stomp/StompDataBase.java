@@ -220,4 +220,8 @@ public class StompDataBase {
     public Set<Integer> getSubscribers(String channel){
         return channels.get(channel);
     }
+
+    public boolean getConnectedUsers(int connectionId){
+        return  connectedUsers.contains(connectedUsers);
+    }
 }

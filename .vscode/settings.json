@@ -62,5 +62,6 @@
         "valarray": "cpp",
         "variant": "cpp"
     },
-    "makefile.makefilePath": "client/"
+    "makefile.makefilePath": "client/",
+    "java.configuration.updateBuildConfiguration": "interactive"
 }

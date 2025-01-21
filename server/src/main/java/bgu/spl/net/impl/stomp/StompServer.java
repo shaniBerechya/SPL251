@@ -20,8 +20,8 @@ public class StompServer {
             if (args[1].equals("tpc")){
                 Server.threadPerClient(
                     port,
-                    () -> new StompMessagingProtocolImpl(), //protocol factory,
-                    () -> new StompMessageEncoderDecoder())//message encoder decoder factory)
+                    StompMessagingProtocolImpl::new, //protocol factory,
+                    StompMessageEncoderDecoder::new)//message encoder decoder factory)
                     .serve(); 
             }
             //case 2: reactor

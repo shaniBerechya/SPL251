@@ -99,7 +99,7 @@ public class StompMessagingProtocolImpl implements StompMessagingProtocol<StompF
     *         or an 'ERROR' message explaining what went wrong.
     */
 
-    private StompFrame connectHendel(StompFrame inputFrame){
+    public StompFrame connectHendel(StompFrame inputFrame){
          // Extract necessary headers
         String version = inputFrame.getHeaderValue("accept-version");
         String host = inputFrame.getHeaderValue("host");
@@ -146,7 +146,7 @@ public class StompMessagingProtocolImpl implements StompMessagingProtocol<StompF
             } 
 
             // Wrong password
-            else {
+        else {
                 return erorGenretor(inputFrame,
                     "Wrong password",
                     null,

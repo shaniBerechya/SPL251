@@ -16,7 +16,8 @@ public class StompDataBase {
     private Map<Integer, Map<Integer, String>> subscriptionsDetails; // Maps connection IDs to maps of subscription IDs to channels
     private Map<Integer, String> messages; // Maps message IDs to message contents
     private AtomicInteger messageIDCounter; // Counter for generating unique message IDs
-    private Set<Integer> connectedUsers; // Set of currently connected usernames
+    private Set<String> connectedUsers; // Set of currently connected usernames
+    private Map<Integer, String> idToUser; //maping each connection id to thier username
 
     private final ReadWriteLock databaseRWLock;
 
@@ -37,6 +38,8 @@ public class StompDataBase {
         messageIDCounter = new AtomicInteger(0);
         connectedUsers = ConcurrentHashMap.newKeySet();
         databaseRWLock = new ReentrantReadWriteLock();
+        idToUser = new ConcurrentHashMap<>();
+        
         
     }
 
@@ -45,9 +48,8 @@ public class StompDataBase {
      * @param connectionID The connectionID to check.
      * @return true if the user is connected, false otherwise.
      */
-    public boolean isConnectedUser(Integer connectionID) {
-
-        return connectedUsers.contains(connectionID);
+    public boolean isConnectedUser(String username) {
+        return connectedUsers.contains(username);
     }
 
     /**
@@ -70,7 +72,8 @@ public class StompDataBase {
     public void addOrUpdateUser(String username, String password,Integer connectionID ) {
         databaseRWLock.writeLock().lock();    
         usersPasswords.put(username, password);
-        connectedUsers.add(connectionID);
+        connectedUsers.add(username);
+        idToUser.put(connectionID, username);
         databaseRWLock.writeLock().unlock();   
     }
 
@@ -78,9 +81,10 @@ public class StompDataBase {
      * Marks a user as connected.
      * @param connectionID The connectionID of the user.
      */
-    public void setNewConnected(Integer connectionID ) {
-        databaseRWLock.writeLock().lock();    
-        connectedUsers.add(connectionID);
+    public void setNewConnected(String username, int connectionID) {
+        databaseRWLock.writeLock().lock();
+        idToUser.put(connectionID, username);
+        connectedUsers.add(username);
         databaseRWLock.writeLock().unlock();
     }
 
@@ -90,8 +94,11 @@ public class StompDataBase {
      */
     public void disconnect(Integer connectionID) {
         databaseRWLock.writeLock().lock();  
-        
-        connectedUsers.remove(connectionID);
+        String user = idToUser.remove(connectionID);
+        if (user != null) {
+            connectedUsers.remove(user);
+        }
+       
         
         //remove the connectionID from all the channels which it subscribe to:
         Map<Integer, String> userChannels = subscriptionsDetails.get(connectionID);
@@ -235,8 +242,9 @@ public class StompDataBase {
         return channels.get(channel);
     }
 
-    @SuppressWarnings("unlikely-arg-type")
     public boolean getConnectedUsers(int connectionId){
-        return  connectedUsers.contains(connectedUsers);
+        return connectedUsers.contains(idToUser.get(connectionId));
     }
+
+    
 }

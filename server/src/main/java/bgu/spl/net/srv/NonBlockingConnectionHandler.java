@@ -50,6 +50,8 @@ public class NonBlockingConnectionHandler<T> implements ConnectionHandler<T> {
                         T nextMessage = encdec.decodeNextByte(buf.get());
                         if (nextMessage != null) {
                             //Inside the process Method we gonna use send method
+                            System.out.println("frame resivd: "+nextMessage.toString() );
+
                             protocol.process(nextMessage);
                         }
                     }
@@ -116,8 +118,12 @@ public class NonBlockingConnectionHandler<T> implements ConnectionHandler<T> {
     @Override
     public void send(T msg) {
         if (msg != null) {
+            System.out.println("frame to send: "+msg.toString() );
             writeQueue.add(ByteBuffer.wrap(encdec.encode(msg)));
             reactor.updateInterestedOps(chan, SelectionKey.OP_READ | SelectionKey.OP_WRITE);
+        }
+        if (protocol.shouldTerminate()){
+            this.close();
         }
     }
 

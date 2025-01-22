@@ -38,10 +38,10 @@ public class ConnectionsImpl<T> implements Connections<T>{
 
     @Override
     public void disconnect(int connectionId) {
-        try {
-            idToHendler.get(connectionId).close();
-        }
-        catch(IOException e){}
+        // try {
+        //     idToHendler.get(connectionId).close();
+        // }
+        // catch(IOException e){}
 
         idToHendler.remove(connectionId);
     }

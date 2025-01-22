@@ -57,11 +57,15 @@ public class BlockingConnectionHandler<T> implements Runnable, ConnectionHandler
             try {
                 out.write(encdec.encode(msg));
                 out.flush();
+                if (protocol.shouldTerminate()){
+                    this.close();
+                }
             }
             catch(IOException e){
                 e.printStackTrace();
             }
         }
+       
     }
     public MessagingProtocol<T> getProtocol(){
         return protocol;

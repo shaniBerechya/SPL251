@@ -39,7 +39,7 @@ public class StompFrame {
 
     public void setHeaders (String complitHeader){
         String[] parts = complitHeader.split(":", 2);
-        String headerName = parts[0].trim();
+        String headerName = parts[0].trim(); 
         String headerValue = parts[1].trim();
         headers.put(headerName,headerValue);
     }
@@ -79,7 +79,7 @@ public class StompFrame {
         builder.append(commend).append("\n");
         //Headers
         for (Map.Entry<String, String> header : headers.entrySet()) {
-            builder.append(header.getKey()).append(" : ").append(header.getValue()).append("\n");
+            builder.append(header.getKey()).append(":").append(header.getValue()).append("\n");
         }
         //FrameBody
         if(frameBody != null){

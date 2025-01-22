@@ -34,41 +34,37 @@ public class StompMessagingProtocolImpl implements StompMessagingProtocol<StompF
 
         // Checks that each command is handled correctly
         else if(commend.equals("CONNECT")){
+            System.out.println("proces: connect");
             StompFrame respond = connectHendel(message);
-            connections.send(connectionId, respond);
-            if (respond.getCommend().equals("ERROR")) {        
-                isTerminate = true;
-            }
+            sendFrame(respond);
         }
         else if(commend.equals("SEND")){
+            System.out.println("proces: send");
             StompFrame respond = sendHendel(message);
             if (respond.getCommend().equals("ERROR")) {        
                 isTerminate = true;
+                dataBase.disconnect(connectionId);
+                connections.disconnect(connectionId);
+                
             }
             String channel = respond.getHeaderValue("destination");
             connections.send(channel, respond);
         }
-        
+
         else if(commend.equals("SUBSCRIBE")){
+            System.out.println("proces: subscribe");
             StompFrame respond = subscribeHendel(message);
-            connections.send(connectionId, respond);
-            if (respond.getCommend().equals("ERROR")) {        
-                isTerminate = true;
-            }
+            sendFrame(respond);
         }
         else if (commend.equals("UNSUBSCRIBE")){
+            System.out.println("proces: unsbscribe");
             StompFrame respond = unsubscribeHendel(message);
-            connections.send(connectionId, respond);
-            if (respond.getCommend().equals("ERROR")) {        
-                isTerminate = true;
-            }
+            sendFrame(respond);
         }
         else if (commend.equals("DISCONNECT")){
+            System.out.println("proces: disconect");
             StompFrame respond = disconnectHendel(message);
-            connections.send(connectionId, respond);
-            if (respond.getCommend().equals("ERROR")) {        
-                isTerminate = true;
-            }
+            sendFrame(respond);
         }
 
         // In case the command is not valid, send an error message
@@ -123,7 +119,7 @@ public class StompMessagingProtocolImpl implements StompMessagingProtocol<StompF
         }
 
         // Check if the user is already logged in
-        if (dataBase.isConnectedUser(connectionId)) {
+        if (dataBase.isConnectedUser(login)) {
             return erorGenretor(inputFrame,
                 "User already logged in",
                 null,
@@ -140,7 +136,7 @@ public class StompMessagingProtocolImpl implements StompMessagingProtocol<StompF
         }
          // Correct password, login successful, add to connected users
         else if (dataBase.getPasswordForUser(login).equals(passcode)) {
-            dataBase.setNewConnected(connectionId);  // Mark user as logged in
+            dataBase.setNewConnected(login, connectionId);  // Mark user as logged in
             StompFrame respond = new StompFrame("CONNECTED");
             respond.setHeaders("version : 1.2");
             return respond;
@@ -180,6 +176,10 @@ public class StompMessagingProtocolImpl implements StompMessagingProtocol<StompF
                 "Missing destination header", receipt,
                 "Did not contain a destination header which is REQUIRED for message propagation.");
         }
+        //removing the '/' from destination
+        if (destination.startsWith("/")) {
+            destination = destination.substring(1);
+        }
         //case 2: frameBody is null
         if(frameBody == null){
             return erorGenretor(inputFrame,
@@ -195,11 +195,11 @@ public class StompMessagingProtocolImpl implements StompMessagingProtocol<StompF
                 "You must be subscribed to the topic to send messages to it.");
         }
 
-        //Generting the 'MESSAGE' message:
+        //Generting the 'MESSAGE' message:   
+        
         int messageID  = dataBase.addMessage(frameBody); //adds the message to the data base
         int subscriptionID = dataBase.getSubscriptionIDForChannel(destination, connectionId);
-
-        String[] headers = {"subscription : " + subscriptionID,"message-id : " + messageID,"destination : " + destination};
+        String[] headers = {"subscription: " + subscriptionID,"message-id: " + messageID,"destination: " + destination};
         StompFrame respond = new StompFrame("MESSAGE", headers, frameBody);
         return respond;
     }
@@ -241,10 +241,9 @@ public class StompMessagingProtocolImpl implements StompMessagingProtocol<StompF
         
         //Subscribe logic:
         dataBase.addChannelSubscription(destination, connectionId, Integer.valueOf(id));
-
         //if the client ask for receipt
         if(receipt != null){
-            return new StompFrame("RECEIPT", new String[] {"receipt - id : "+ receipt } , null);
+            return new StompFrame("RECEIPT", new String[] {"receipt-id:"+ receipt } , null);
         }
 
         return null;
@@ -290,7 +289,7 @@ public class StompMessagingProtocolImpl implements StompMessagingProtocol<StompF
         
         //if the client ask for receipt
         if(receipt != null){
-            return new StompFrame("RECEIPT", new String[] {"receipt - id : "+ receipt } , null);
+            return new StompFrame("RECEIPT", new String[] {"receipt-id:"+ receipt } , null);
         }
         return null;
     }
@@ -330,10 +329,19 @@ public class StompMessagingProtocolImpl implements StompMessagingProtocol<StompF
         StompFrame erorRespond = new StompFrame("ERROR");
         erorRespond.setHeaders("message :"+ erorMessage);
         if(messageID != null){
-            erorRespond.setHeaders("receipt - id :" + messageID);
+            erorRespond.setHeaders("receipt-id:" + messageID);
         }
-        String bodyFrame = "The message: \n ----- \n "+ defultedFrame.toString() + "\n ----- \n " + erorExplanetion;  
+        String bodyFrame = "The message:\n-----\n"+ defultedFrame.toString() + "\n ----- \n" + erorExplanetion;  
         erorRespond.setFrameBody(bodyFrame);
         return erorRespond;
+    }
+
+    private void sendFrame(StompFrame respond){
+        connections.send(connectionId, respond);
+            if (respond.getCommend().equals("ERROR")) {        
+                dataBase.disconnect(connectionId);
+                connections.disconnect(connectionId);
+                isTerminate = true;
+            }
     }
 }

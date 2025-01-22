@@ -238,7 +238,6 @@ public class StompDataBase {
     }
 
     public Set<Integer> getSubscribers(String channel){
-        System.out.println("channels is null: " + channels == null);
         return channels.get(channel);
     }
 

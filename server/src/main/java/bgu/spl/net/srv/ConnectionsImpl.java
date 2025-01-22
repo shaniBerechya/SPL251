@@ -1,6 +1,5 @@
 package bgu.spl.net.srv;
 
-import java.io.IOException;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -28,9 +27,11 @@ public class ConnectionsImpl<T> implements Connections<T>{
 
     @Override
     public void send(String channel, T msg) {
+        System.out.println("im in the send by chanel");
         Set<Integer> subToChannel = database.getSubscribers(channel);
         if (subToChannel != null){
             for (Integer subConnectionId : subToChannel){
+                System.out.println("sending to: " + subConnectionId + " .....");
                 send(subConnectionId,msg);
             }
         }

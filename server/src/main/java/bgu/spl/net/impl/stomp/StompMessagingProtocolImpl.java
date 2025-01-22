@@ -47,7 +47,7 @@ public class StompMessagingProtocolImpl implements StompMessagingProtocol<StompF
                 connections.disconnect(connectionId);
                 
             }
-            String channel = respond.getHeaderValue("destination");
+            String channel = respond.getHeaderValue("destination").substring(1);
             connections.send(channel, respond);
         }
 
@@ -151,8 +151,7 @@ public class StompMessagingProtocolImpl implements StompMessagingProtocol<StompF
         }
     }
 
-    
-
+    /********************************************************************************************/
     /**
     * @param inputFrame the {@link StompFrame.headers} should contain only 'destination' header,
     *        and also we gonna add 'receipt' but it's not mendatory.
@@ -199,11 +198,11 @@ public class StompMessagingProtocolImpl implements StompMessagingProtocol<StompF
         
         int messageID  = dataBase.addMessage(frameBody); //adds the message to the data base
         int subscriptionID = dataBase.getSubscriptionIDForChannel(destination, connectionId);
-        String[] headers = {"subscription: " + subscriptionID,"message-id: " + messageID,"destination: " + destination};
+        String[] headers = {"subscription: " + subscriptionID,"message-id: " + messageID,"destination:/" + destination};
         StompFrame respond = new StompFrame("MESSAGE", headers, frameBody);
         return respond;
     }
-
+    /********************************************************************************************/
     /**
     * @param inputFrame should contain the following {@link StompFrame.headers}:
     *        'destination', 'id'.
@@ -249,6 +248,7 @@ public class StompMessagingProtocolImpl implements StompMessagingProtocol<StompF
         return null;
     }
 
+    /********************************************************************************************/
     /**
     * @param inputFrame the {@link StompFrame.headers} should contain only the 'id' header.
     *        The {@link StompFrame.FrameBody} should be null.
@@ -293,7 +293,8 @@ public class StompMessagingProtocolImpl implements StompMessagingProtocol<StompF
         }
         return null;
     }
-
+    
+    /********************************************************************************************/
     /**
     * @param inputFrame the {@link StompFrame.headers} should contain only the 'receipt' header.
     *        The {@link StompFrame.FrameBody} should be null.
@@ -322,7 +323,7 @@ public class StompMessagingProtocolImpl implements StompMessagingProtocol<StompF
         dataBase.disconnect(connectionId);
         return new StompFrame("RECEIPT", new String[] {"receipt-id:"+ receipt } , null);
     }
-
+    /********************************************************************************************/
     /********************************************* Other Mthods *******************************************************************/
     
     private StompFrame erorGenretor(StompFrame defultedFrame,String erorMessage,String messageID,String erorExplanetion ){

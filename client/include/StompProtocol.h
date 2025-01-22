@@ -2,6 +2,7 @@
 
 #include "../include/ConnectionHandler.h"
 #include "../include/StompFrame.h"
+#include "../include/event.h"
 #include <string> 
 #include <iostream>
 
@@ -11,6 +12,7 @@ class StompProtocol
 private:
     //Fildes:
     bool isTerminate;
+    map<string,Event> eventMap;
 
     //handeling protocol:
     //key bord:
@@ -27,8 +29,6 @@ private:
     string erorHendl(StompFrame frame);
     string messageHendel(StompFrame frame);
 
-
-
 public:
     StompProtocol();
     ~StompProtocol();
@@ -38,6 +38,4 @@ public:
     //Keybord:
     void processKeybord(string& line);
     bool shouldTerminateKeybord();
-
-
 };

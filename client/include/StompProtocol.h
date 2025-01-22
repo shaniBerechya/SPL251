@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../include/ConnectionHandler.h"
+#include "../include/StompFrame.h"
 #include <string> 
 #include <iostream>
 
@@ -8,7 +9,35 @@
 class StompProtocol
 {
 private:
+    //Fildes:
+    bool isTerminate;
+
+    //handeling protocol:
+    //key bord:
+    StompFrame logingHendel(vector<string>& lineCommands);
+    StompFrame joinHendel(vector<string>& lineCommands);
+    StompFrame exitHendel(vector<string>& lineCommands);
+    StompFrame reportHendel(vector<string>& lineCommands);
+    StompFrame logoutHendel();
+
+    string summaryHendel(vector<string>& lineCommands);
+
+    //server:
+    void receiptHendel(StompFrame frame);
+    string erorHendl(StompFrame frame);
+    string messageHendel(StompFrame frame);
+
+
+
 public:
-    void processServer();
-    void processKeybord();
+    StompProtocol();
+    ~StompProtocol();
+    //server:
+    void processServer(StompFrame& frame);
+    bool shouldTerminateServer();
+    //Keybord:
+    void processKeybord(string& line);
+    bool shouldTerminateKeybord();
+
+
 };

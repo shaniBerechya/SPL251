@@ -32,8 +32,9 @@ public:
     string getFrameBody() const;
 
     //seters:
-    void setCommand(string& command);
+    void setCommand(string command);
     void setHeaders (string& complitHeader);
+    void setHeadersByParts (string hederName,string hederValue);
     void setMultiHeaders(vector<string>& completeHeaders);
     void setFrameBody(string& frameBody);
 

@@ -12,22 +12,34 @@ class StompProtocol
 private:
     //Fildes:
     bool isTerminate;
-    map<string,Event> eventMap;
+    map<string,vector<Event>> eventMap;
+    vector<string> channels; 
+    vector<string> reciepts;
+    bool isConnected;
+    ConnectionHandler connectionHandlerToServer;
 
     //handeling protocol:
     //key bord:
-    StompFrame logingHendel(vector<string>& lineCommands);
-    StompFrame joinHendel(vector<string>& lineCommands);
-    StompFrame exitHendel(vector<string>& lineCommands);
-    StompFrame reportHendel(vector<string>& lineCommands);
-    StompFrame logoutHendel();
-
-    string summaryHendel(vector<string>& lineCommands);
+    void logingHendel(vector<string>& lineCommands);
+    void joinHendel(vector<string>& lineCommands);
+    void exitHendel(vector<string>& lineCommands);
+    void reportHendel(vector<string>& lineCommands);
+    void logoutHendel();
+    void summaryHendel(vector<string>& lineCommands);
 
     //server:
     void receiptHendel(StompFrame frame);
     string erorHendl(StompFrame frame);
     string messageHendel(StompFrame frame);
+    void connectedtHendel(StompFrame frame);
+
+
+    //other:
+    vector<string> split(const string &str, char delim);
+    int generateSubscriptionId();
+    int findIndex(vector<string>& v, string val);
+
+
 
 public:
     StompProtocol();

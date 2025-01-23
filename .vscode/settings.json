@@ -74,5 +74,6 @@
         "shared_mutex": "cpp"
     },
     "makefile.makefilePath": "client/",
-    "java.configuration.updateBuildConfiguration": "interactive"
+    "java.configuration.updateBuildConfiguration": "interactive",
+    "C_Cpp.errorSquiggles": "enabled"
 }

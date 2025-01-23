@@ -1,5 +1,7 @@
 #include "../include/StompProtocol.h"
 #include "../include/StompFrame.h"
+#include "../include/event.h"
+#include <algorithm> 
 #include <iostream>
 #include <sstream>
 #include <vector>
@@ -7,21 +9,43 @@
 #include <sstream>
 #include <iostream>
 #include <sstream> // For converting numbers to strings if needed
+#include <json.hpp>
+#include <fstream>
+using json = nlohmann::json;
+using namespace std;
 
 
 
 
-StompProtocol::StompProtocol() : isTerminate(false), isConnected(false){}
+StompProtocol::StompProtocol() : isTerminate(false), isConnected(false), username("") {}
 
 StompProtocol::~StompProtocol(){}
 
 //server:
     void StompProtocol::processServer(StompFrame& frame){
+        std::string command = frame.getCommand();
 
+        // Check the command type of the frame and handle accordingly
+        if (command == "CONNECTED") {
+            // Handle server's response to a CONNECT command
+            connectedtHendel(frame);
+        } else if (command == "MESSAGE") {
+            // Handle a MESSAGE command which may contain actual data or notifications
+            messageHendel(frame);
+        } else if (command == "RECEIPT") {
+            // Handle a RECEIPT command, which acknowledges actions previously sent to the server
+            receiptHendel(frame);
+        } else if (command == "ERROR") {
+            // Handle an ERROR command, which reports an error from the server
+            erorHendl(frame);
+        } else {
+            // Log an error or handle unexpected commands
+            std::cerr << "Received an unsupported command: " << command << std::endl;
+        }
     }
 
     bool StompProtocol::shouldTerminateServer(){
-
+        return isTerminate;
     }
 
     void StompProtocol::connectedtHendel(StompFrame frame){
@@ -32,56 +56,77 @@ StompProtocol::~StompProtocol(){}
         int recieptID = stoi(frame.getHeaderByName("receipt-id")); 
         string toPrint = reciepts[recieptID];
         if(toPrint == "Logged out"){
-            //TODO
-             isConnected = false;  // Set the client's connection status to false
-
+            isConnected = false;  // Set the client's connection status to false
+            isTerminateServer = true;
         }
         std::cout << toPrint << std::endl;
-
     }
 
-    string StompProtocol::erorHendl(StompFrame frame){
+    void StompProtocol::erorHendl(StompFrame frame){
         if(frame.getHeaderByName("erorMessage") == "User already logged in"){
-            std::cout << "User already logged in" << std::endl;
+            std::cout << "login failed" << std::endl;
         }
         else if(frame.getHeaderByName("erorMessage") == "Wrong password"){
             std::cout << "Wrong password" << std::endl;
         }
-
+        std::cout << "ERROR FROM THE SERVER: \n" + frame.toString()<< std::endl;
+        isTerminateServer = true;
+        isTerminate = true;
     }
-    string StompProtocol::messageHendel(StompFrame frame){
 
+    void StompProtocol::messageHendel(StompFrame frame) {
+        // Extracting channel name from the frame header
+        string channelName = frame.getHeaderByName("destination");
+
+        // Parsing the body to extract the sender's name and other event details
+        string body = frame.getFrameBody();
+        Event event(frame.getFrameBody());
+  
+        string sender = event.get_eventOwnerUser();
+
+       // Update the event map
+        eventsMap[channelName].push_back(event);
+
+        std::cout << "Processed message from " << sender << " in channel " << channelName << std::endl;
     }
     
 //Keybord:
-    void StompProtocol::processKeybord(string& line) {
+    void StompProtocol::processKeybord(string& line,ConnectionHandler* &handlerPtr) {
         vector<string> lineCommands = split(line, ' '); // A utility function split needs to be defined or included before.
         string command = lineCommands[0];
 
         if (command == "login") {
             // login {host:port} {username} {password}
-            logingHendel(lineCommands);
+            logingHendel(lineCommands, handlerPtr);
             // Further code to send this frame to the server
         } else if (command == "join") {
             // join {channel_name}
-            joinHendel(lineCommands);
+            joinHendel(lineCommands, handlerPtr);
             // Further code to send this frame to the server
         } else if (command == "exit") {
             // exit {channel_name}
-            exitHendel(lineCommands);
+            exitHendel(lineCommands, handlerPtr);
             // Further code to send this frame to the server
-        } else if (command == "report") {
+        } else if (command == "report", handlerPtr) {
             // report {file_name}
-            reportHendel(lineCommands);
+            reportHendel(lineCommands, handlerPtr);
             // Further code to send this frame to the server
         } else if (command == "logout") {
             // logout
-            logoutHendel();
+            logoutHendel(handlerPtr);
             // Further code to send this frame to the server
-        } else {
+        } else if(command == "summary") {
+            summaryHendel(lineCommands);
+        }
+        else {
            std::cout << "Unknown command" << std::endl;
         }
     }
+ 
+    bool StompProtocol::shouldTerminateKeybord(){
+        return isTerminate;
+    }
+    
     std::vector<std::string> StompProtocol::split(const std::string& s, char delimiter) {
         std::vector<std::string> tokens;
         std::string token;
@@ -92,12 +137,7 @@ StompProtocol::~StompProtocol(){}
         return tokens;
     }
 
-
-    bool StompProtocol::shouldTerminateKeybord(){
-
-    }
-
-    void StompProtocol::logingHendel(vector<string>& lineCommands) {
+    void StompProtocol::logingHendel(vector<string>& lineCommands,ConnectionHandler* &handlerPtr ) {
         if (lineCommands.size() != 4) {
             std::cout << "Usage: login {host:port} {username} {password}" << std::endl;
         }
@@ -120,14 +160,14 @@ StompProtocol::~StompProtocol(){}
         int portInt = std::stoi(portStr);  
         short portShort = static_cast<short>(portInt);  
 
-        ConnectionHandler connectionHandlerToServer(host, portShort);
+        handlerPtr = new ConnectionHandler(host, portShort);//TODO needs to be dalted
 
-         if (!connectionHandlerToServer.connect()) {
+         if (!handlerPtr->connect()) {
             std::cerr << "Cannot connect to server" << std::endl;
          }
          else{
              // Username and password
-            string username = lineCommands[2];
+            string userName = lineCommands[2];
             string password = lineCommands[3];
 
             // Building the STOMP frame for CONNECT
@@ -135,17 +175,19 @@ StompProtocol::~StompProtocol(){}
             frame.setCommand("CONNECT");
             frame.setHeadersByParts("accept-version", "1.2");
             frame.setHeadersByParts("host", host); // Assuming the host includes virtual host functionality
-            frame.setHeadersByParts("login", username);
+            frame.setHeadersByParts("login", userName);
             frame.setHeadersByParts("passcode", password);
 
             //sending:
-            connectionHandlerToServer.sendFrameAscii(frame.toString(), '\u0000');
+            handlerPtr->sendFrameAscii(frame.toString(), '\u0000');
             isConnected = true;
+            username = userName;
          }
 
        
     }
-    void StompProtocol::joinHendel(vector<string>& lineCommands){
+
+    void StompProtocol::joinHendel(vector<string>& lineCommands, ConnectionHandler* &handlerPtr){
         if (lineCommands.size() != 2) {
             std::cout << "Usage: join {channel_name}" << std::endl;
         }
@@ -165,11 +207,9 @@ StompProtocol::~StompProtocol(){}
         frame.setHeadersByParts("receipt", std::to_string(receiptId));
 
          //sending and update data:
-        connectionHandlerToServer.sendFrameAscii(frame.toString(), '\u0000');
+        handlerPtr->sendFrameAscii(frame.toString(), '\u0000');
         channels[subId] = (channelName);
         reciepts[receiptId] =("Joined channel " + lineCommands[1]);
-
-
     }
 
     // Function definition to create a unique identifier for each subscription
@@ -179,7 +219,7 @@ StompProtocol::~StompProtocol(){}
     }
 
 
-    void StompProtocol::exitHendel(vector<string>& lineCommands){
+    void StompProtocol::exitHendel(vector<string>& lineCommands, ConnectionHandler* &handlerPtr){
          string channelName = "/"+ lineCommands[1];
         // Check if the user is subscribed to the channel
         if (count(channels.begin(), channels.end(), channelName) == 0) {
@@ -201,15 +241,38 @@ StompProtocol::~StompProtocol(){}
         channels.erase(channels.begin()+subId);
 
         //sending the frame
-        connectionHandlerToServer.sendFrameAscii(frame.toString(), '\u0000');
+        handlerPtr->sendFrameAscii(frame.toString(), '\u0000');
 
     }
 
-    void StompProtocol::reportHendel(vector<string>& lineCommands){
-       
+    void StompProtocol::reportHendel(vector<string>& lineCommands, ConnectionHandler* &handlerPtr){
+        if (lineCommands.size() != 2) {
+            cout << "Usage: report {file_path}" << endl;
+            return; // Return an empty frame or handle the error appropriately
+        }
+
+        string filePath = lineCommands[1];
+        names_and_events namesAndEvents = parseEventsFile(filePath);
+        
+        //adding the senders to all the events:
+        //and create the massege to send
+        for(Event event : namesAndEvents.events){
+            event.setEventOwnerUser(username);
+
+            //create the frame:
+            StompFrame frame;
+            frame.setCommand("SEND");
+            frame.setHeadersByParts("destination", namesAndEvents.channel_name);
+
+            frame.setFrameBody(event.getBodyFromEvent());
+
+            // Sending the frame 
+            handlerPtr->sendFrameAscii(frame.toString(), '\u0000');
+        }
+
     }
 
-    void StompProtocol::logoutHendel(){
+    void StompProtocol::logoutHendel(ConnectionHandler* &handlerPtr){
         if (!isConnected) {
             std::cout << "please login first" << std::endl;
         }
@@ -224,7 +287,7 @@ StompProtocol::~StompProtocol(){}
         reciepts[receiptId] = "Logged out";
 
         //sending the frame
-        connectionHandlerToServer.sendFrameAscii(frame.toString(), '\u0000');
+        handlerPtr->sendFrameAscii(frame.toString(), '\u0000');
 
     }
 
@@ -233,10 +296,11 @@ StompProtocol::~StompProtocol(){}
     }
 
     int StompProtocol::findIndex(vector<string>& v, string val) {
-    for (int i = 0; i < v.size(); i++) {
-      
-          // When the element is found
-        if (v[i] == val) {
-            return i;
+        for (int i = 0; i < v.size(); i++) {
+              // When the element is found
+            if (v[i] == val) {
+                return i;
+            }
         }
+        return -1;
     }

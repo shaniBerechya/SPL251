@@ -36,7 +36,7 @@ public:
     void setHeaders (string& complitHeader);
     void setHeadersByParts (string hederName,string hederValue);
     void setMultiHeaders(vector<string>& completeHeaders);
-    void setFrameBody(string& frameBody);
+    void setFrameBody(string frameBody);
 
     //other:
     string toString();

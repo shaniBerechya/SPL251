@@ -11,26 +11,28 @@ class StompProtocol
 {
 private:
     //Fildes:
+    bool isTerminateServer;
     bool isTerminate;
-    map<string,vector<Event>> eventMap;
-    vector<string> channels; 
-    vector<string> reciepts;
+    
     bool isConnected;
-    ConnectionHandler connectionHandlerToServer;
+    string username;
+    vector<string> channels; 
+    map<string, vector<Event>> eventsMap;
+    vector<string> reciepts;
 
     //handeling protocol:
     //key bord:
-    void logingHendel(vector<string>& lineCommands);
-    void joinHendel(vector<string>& lineCommands);
-    void exitHendel(vector<string>& lineCommands);
-    void reportHendel(vector<string>& lineCommands);
-    void logoutHendel();
+    void logingHendel(vector<string>& lineCommands, ConnectionHandler* &handlerPtr);
+    void joinHendel(vector<string>& lineCommands,ConnectionHandler* &handlerPtr );
+    void exitHendel(vector<string>& lineCommands, ConnectionHandler* &handlerPtr);
+    void reportHendel(vector<string>& lineCommands, ConnectionHandler* &handlerPtr);
+    void logoutHendel(ConnectionHandler* &handlerPtr);
     void summaryHendel(vector<string>& lineCommands);
 
     //server:
     void receiptHendel(StompFrame frame);
-    string erorHendl(StompFrame frame);
-    string messageHendel(StompFrame frame);
+    void erorHendl(StompFrame frame);
+    void messageHendel(StompFrame frame);
     void connectedtHendel(StompFrame frame);
 
 
@@ -48,6 +50,7 @@ public:
     void processServer(StompFrame& frame);
     bool shouldTerminateServer();
     //Keybord:
-    void processKeybord(string& line);
+    void processKeybord(string& line, ConnectionHandler* &handlerPtr);
     bool shouldTerminateKeybord();
+
 };

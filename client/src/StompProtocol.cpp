@@ -108,6 +108,8 @@ StompProtocol::~StompProtocol(){}
         string command = lineCommands[0];
 
         if (command == "login") {
+            std::cout << "got commend: login" << std::endl;
+
             // login {host:port} {username} {password}
             logingHendel(lineCommands, handlerPtr);
             // Further code to send this frame to the server
@@ -157,6 +159,8 @@ StompProtocol::~StompProtocol(){}
     }
 
     void StompProtocol::logingHendel(vector<string>& lineCommands,ConnectionHandler* &handlerPtr ) {
+        std::cout << "got commend: logingHendel" << std::endl;
+
         if (lineCommands.size() != 4) {
             std::cout << "Usage: login {host:port} {username} {password}" << std::endl;
         }

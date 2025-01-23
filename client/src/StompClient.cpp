@@ -47,6 +47,7 @@ void handleServer(StompProtocol& protocol,ConnectionHandler* handlerPtr) {
 			protocol.processServer(frame);
 		}	
         handlerPtr->close();
+        delete handlerPtr;
 	}
 }
 

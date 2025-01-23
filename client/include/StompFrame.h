@@ -19,7 +19,7 @@ private:
 public:
     //constractors:
     StompFrame();
-    StompFrame(string& command,vector<string>& completeHeaders,string& frameBody);
+    StompFrame(string& command,map<string,string> completeHeaders,string& frameBody);
     StompFrame(string& command);
 
     //destractors:
@@ -33,9 +33,7 @@ public:
 
     //seters:
     void setCommand(string command);
-    void setHeaders (string& complitHeader);
     void setHeadersByParts (string hederName,string hederValue);
-    void setMultiHeaders(vector<string>& completeHeaders);
     void setFrameBody(string frameBody);
 
     //other:

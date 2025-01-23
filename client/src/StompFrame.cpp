@@ -1,11 +1,11 @@
     #include "../include/StompFrame.h" 
     
     //constractors:
-    StompFrame::StompFrame(){}
+    StompFrame::StompFrame():command(""), headers(), frameBody("") {}
     StompFrame::StompFrame(string& command, map<string,string> completeHeaders,string& frameBody):
     command(command),headers(completeHeaders),frameBody(frameBody)  {}
     
-    StompFrame::StompFrame(string& command):command(command){}
+    StompFrame::StompFrame(string& command):command(command),headers(), frameBody(""){}
 
     //destractors:
     StompFrame::~StompFrame(){}

@@ -73,9 +73,12 @@ const std::string Event::getBodyFromEvent() const{
     body << "event name: " << name << "\n";
     body << "date time: " << date_time << "\n";
     body << "general information:\n";
-    for (const auto& [key, value] : general_information) {
+    for (const auto& entry : general_information) {
+        const auto& key = entry.first;
+        const auto& value = entry.second;
         body << "    " << key << ": " << value << "\n"; // Indent each general information entry
     }
+
     body << "description:\n" << description << "\n";
     return body.str();
 }

@@ -17,7 +17,8 @@ using namespace std;
 
 
 
-StompProtocol::StompProtocol() : isTerminate(false), isConnected(false), username("") {}
+StompProtocol::StompProtocol():
+isTerminateServer(false),isTerminate(false), isConnected(false),username(""),channels(),eventsMap(),reciepts() {}
 
 StompProtocol::~StompProtocol(){}
 
@@ -385,10 +386,10 @@ StompProtocol::~StompProtocol(){}
 
 
     int StompProtocol::findIndex(vector<string>& v, string val) {
-        for (int i = 0; i < v.size(); i++) {
+        for (std::size_t i = 0; i < v.size(); i++) {
               // When the element is found
             if (v[i] == val) {
-                return i;
+                return static_cast<int>(i);
             }
         }
         return -1;

@@ -110,28 +110,35 @@ StompProtocol::~StompProtocol(){}
             // login {host:port} {username} {password}
             logingHendel(lineCommands, handlerPtr);
             // Further code to send this frame to the server
-        } else if (command == "join") {
+        }
+        else if(isConnected){
+            if (command == "join") {
             // join {channel_name}
             joinHendel(lineCommands, handlerPtr);
             // Further code to send this frame to the server
-        } else if (command == "exit") {
-            // exit {channel_name}
-            exitHendel(lineCommands, handlerPtr);
-            // Further code to send this frame to the server
-        } else if (command == "report", handlerPtr) {
-            // report {file_name}
-            reportHendel(lineCommands, handlerPtr);
-            // Further code to send this frame to the server
-        } else if (command == "logout") {
-            // logout
-            logoutHendel(handlerPtr);
-            // Further code to send this frame to the server
-        } else if(command == "summary") {
-            summaryHendel(lineCommands);
+            } else if (command == "exit") {
+                // exit {channel_name}
+                exitHendel(lineCommands, handlerPtr);
+                // Further code to send this frame to the server
+            } else if (command == "report", handlerPtr) {
+                // report {file_name}
+                reportHendel(lineCommands, handlerPtr);
+                // Further code to send this frame to the server
+            } else if (command == "logout") {
+                // logout
+                logoutHendel(handlerPtr);
+                // Further code to send this frame to the server
+            } else if(command == "summary") {
+                summaryHendel(lineCommands);
+            }
+            else {
+                std::cout << "Unknown command" << std::endl;   
+            }
         }
-        else {
-           std::cout << "Unknown command" << std::endl;
+        else{
+            std::cout << "you have to login first" << std::endl;   
         }
+        
     }
  
     bool StompProtocol::shouldTerminateKeybord(){

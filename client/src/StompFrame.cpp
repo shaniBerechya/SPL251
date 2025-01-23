@@ -48,5 +48,5 @@
         }
 
         respond = respond + "/n" + frameBody + "\u0000"; //adding delimiter
-
+        return respond;
     }

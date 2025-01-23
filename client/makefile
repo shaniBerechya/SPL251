@@ -4,7 +4,7 @@ LDFLAGS:=-lboost_system -lpthread
 all: StompClient
 
 StompClient: bin/ConnectionHandler.o bin/StompFrame.o bin/StompProtocol.o bin/event.o bin/StompClient.o
-	g++ -o bin/StompClient bin/StompFrame.o bin/StompProtocol.o bin/event.o bin/StompClient.o $(LDFLAGS)
+	g++ -o bin/StompClient bin/ConnectionHandler.o bin/StompFrame.o bin/StompProtocol.o bin/event.o bin/StompClient.o $(LDFLAGS)
 
 StompWCIClient: bin/ConnectionHandler.o bin/StompClient.o bin/event.o
 	g++ -o bin/StompWCIClient bin/ConnectionHandler.o bin/StompClient.o $(LDFLAGS)

@@ -215,10 +215,9 @@ StompProtocol::~StompProtocol(){}
         if (lineCommands.size() != 2) {
             std::cout << "Usage: join {channel_name}" << std::endl;
         }
-
+        
         // Extract the channel name from the input
         string channelName = lineCommands[1];
-
         // Generate a subscription ID and a receipt ID
         int subId = generateSubscriptionId();
         int receiptId = generateSubscriptionId(); // Assumes that the same ID generation can be used for other purposes
@@ -230,6 +229,7 @@ StompProtocol::~StompProtocol(){}
         frame.setHeadersByParts("id", std::to_string(subId));
         frame.setHeadersByParts("receipt", std::to_string(receiptId));
 
+        cout << "Sending JOIN frame: " << frame.toString() << endl;
          //sending and update data:
         hendlerPtr->sendFrameAscii(frame.toString(), '\u0000');
         channels[subId] = (channelName);

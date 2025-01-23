@@ -44,9 +44,9 @@
 
         //adding the heders:
         for (auto& header: headers){
-            respond = respond + header.first + ":" + header.second + "/n";
+            respond = respond + header.first + ":" + header.second + "\n";
         }
 
-        respond = respond + "/n" + frameBody + "\u0000"; //adding delimiter
+        respond = respond + "\n" + frameBody + "\u0000"; //adding delimiter
         return respond;
     }

@@ -103,7 +103,7 @@ StompProtocol::~StompProtocol(){}
     }
     
 //Keybord:
-    void StompProtocol::processKeybord(string& line,ConnectionHandler* &handlerPtr) {
+    void StompProtocol::processKeybord(string& line,std::promise<std::shared_ptr<ConnectionHandler>>& promiseHendler) {
         vector<string> lineCommands = split(line, ' '); // A utility function split needs to be defined or included before.
         string command = lineCommands[0];
 
@@ -111,25 +111,25 @@ StompProtocol::~StompProtocol(){}
             std::cout << "got commend: login" << std::endl;
 
             // login {host:port} {username} {password}
-            logingHendel(lineCommands, handlerPtr);
+            logingHendel(lineCommands, promiseHendler);
             // Further code to send this frame to the server
         }
         else if(isConnected){
             if (command == "join") {
             // join {channel_name}
-            joinHendel(lineCommands, handlerPtr);
+            joinHendel(lineCommands, promiseHendler);
             // Further code to send this frame to the server
             } else if (command == "exit") {
                 // exit {channel_name}
-                exitHendel(lineCommands, handlerPtr);
+                exitHendel(lineCommands, promiseHendler);
                 // Further code to send this frame to the server
-            } else if (command == "report", handlerPtr) {
+            } else if (command == "report", hendlerPtr) {
                 // report {file_name}
-                reportHendel(lineCommands, handlerPtr);
+                reportHendel(lineCommands, promiseHendler);
                 // Further code to send this frame to the server
             } else if (command == "logout") {
                 // logout
-                logoutHendel(handlerPtr);
+                logoutHendel(promiseHendler);
                 // Further code to send this frame to the server
             } else if(command == "summary") {
                 summaryHendel(lineCommands);
@@ -158,7 +158,7 @@ StompProtocol::~StompProtocol(){}
         return tokens;
     }
 
-    void StompProtocol::logingHendel(vector<string>& lineCommands,ConnectionHandler* &handlerPtr ) {
+    void StompProtocol::logingHendel(vector<string>& lineCommands,std::promise<std::shared_ptr<ConnectionHandler>>& promiseHendler ) {
         std::cout << "got commend: logingHendel" << std::endl;
 
         if (lineCommands.size() != 4) {
@@ -183,9 +183,10 @@ StompProtocol::~StompProtocol(){}
         int portInt = std::stoi(portStr);  
         short portShort = static_cast<short>(portInt);  
 
-        handlerPtr = new ConnectionHandler(host, portShort);//TODO needs to be dalted
+        hendlerPtr = std::make_shared<ConnectionHandler>(host, portShort);
+        promiseHendler.set_value(hendlerPtr);
 
-         if (!handlerPtr->connect()) {
+         if (!hendlerPtr->connect()) {
             std::cerr << "Cannot connect to server" << std::endl;
          }
          else{
@@ -202,7 +203,7 @@ StompProtocol::~StompProtocol(){}
             frame.setHeadersByParts("passcode", password);
 
             //sending:
-            handlerPtr->sendFrameAscii(frame.toString(), '\u0000');
+            hendlerPtr->sendFrameAscii(frame.toString(), '\u0000');
             isConnected = true;
             username = userName;
          }
@@ -210,7 +211,7 @@ StompProtocol::~StompProtocol(){}
        
     }
 
-    void StompProtocol::joinHendel(vector<string>& lineCommands, ConnectionHandler* &handlerPtr){
+    void StompProtocol::joinHendel(vector<string>& lineCommands, std::promise<std::shared_ptr<ConnectionHandler>>& promiseHendler){
         if (lineCommands.size() != 2) {
             std::cout << "Usage: join {channel_name}" << std::endl;
         }
@@ -230,7 +231,7 @@ StompProtocol::~StompProtocol(){}
         frame.setHeadersByParts("receipt", std::to_string(receiptId));
 
          //sending and update data:
-        handlerPtr->sendFrameAscii(frame.toString(), '\u0000');
+        hendlerPtr->sendFrameAscii(frame.toString(), '\u0000');
         channels[subId] = (channelName);
         reciepts[receiptId] =("Joined channel " + lineCommands[1]);
     }
@@ -242,7 +243,7 @@ StompProtocol::~StompProtocol(){}
     }
 
 
-    void StompProtocol::exitHendel(vector<string>& lineCommands, ConnectionHandler* &handlerPtr){
+    void StompProtocol::exitHendel(vector<string>& lineCommands, std::promise<std::shared_ptr<ConnectionHandler>>& promiseHendler){
          string channelName = lineCommands[1];
         // Check if the user is subscribed to the channel
         if (count(channels.begin(), channels.end(), channelName) == 0) {
@@ -264,11 +265,11 @@ StompProtocol::~StompProtocol(){}
         channels.erase(channels.begin()+subId);
 
         //sending the frame
-        handlerPtr->sendFrameAscii(frame.toString(), '\u0000');
+        hendlerPtr->sendFrameAscii(frame.toString(), '\u0000');
 
     }
 
-    void StompProtocol::reportHendel(vector<string>& lineCommands, ConnectionHandler* &handlerPtr){
+    void StompProtocol::reportHendel(vector<string>& lineCommands, std::promise<std::shared_ptr<ConnectionHandler>>& promiseHendler){
         if (lineCommands.size() != 2) {
             cout << "Usage: report {file_path}" << endl;
             return; // Return an empty frame or handle the error appropriately
@@ -290,12 +291,12 @@ StompProtocol::~StompProtocol(){}
             frame.setFrameBody(event.getBodyFromEvent());
 
             // Sending the frame 
-            handlerPtr->sendFrameAscii(frame.toString(), '\u0000');
+            hendlerPtr->sendFrameAscii(frame.toString(), '\u0000');
         }
 
     }
 
-    void StompProtocol::logoutHendel(ConnectionHandler* &handlerPtr){
+    void StompProtocol::logoutHendel(std::promise<std::shared_ptr<ConnectionHandler>>& promiseHendler){
         if (!isConnected) {
             std::cout << "please login first" << std::endl;
         }
@@ -310,7 +311,7 @@ StompProtocol::~StompProtocol(){}
         reciepts[receiptId] = "Logged out";
 
         //sending the frame
-        handlerPtr->sendFrameAscii(frame.toString(), '\u0000');
+        hendlerPtr->sendFrameAscii(frame.toString(), '\u0000');
 
     }
 

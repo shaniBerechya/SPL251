@@ -25,7 +25,6 @@ bool ConnectionHandler::connect() {
 		tcp::endpoint endpoint(boost::asio::ip::address::from_string(host_), port_); // the server endpoint
 		boost::system::error_code error;
 		socket_.connect(endpoint, error);
-		std::cout << "connected from connection hendler" << std::endl;
 
 		if (error)
 			throw boost::system::system_error(error);
@@ -34,6 +33,7 @@ bool ConnectionHandler::connect() {
 		std::cerr << "Connection failed (Error: " << e.what() << ')' << std::endl;
 		return false;
 	}
+	std::cout << "connected from connection hendler" << std::endl;
 	return true;
 }
 

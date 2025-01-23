@@ -49,3 +49,4 @@ struct names_and_events {
 
 // function that parses the json file and returns a names_and_events object
 names_and_events parseEventsFile(std::string json_path);
+void split_str(const std::string& input, char delimiter, std::vector<std::string>& output);

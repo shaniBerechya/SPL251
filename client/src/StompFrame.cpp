@@ -5,7 +5,7 @@
     StompFrame::StompFrame(string& command, map<string,string> completeHeaders,string& frameBody):
     command(command),headers(completeHeaders),frameBody(frameBody)  {}
     
-    StompFrame::StompFrame(string& command):StompFrame(command){}
+    StompFrame::StompFrame(string& command):command(command){}
 
     //destractors:
     StompFrame::~StompFrame(){}

@@ -2,8 +2,7 @@
 #include <thread>
 #include <vector>
 #include <string>
-#include "../include/StompProtocol.h" 
-#include "../include/ConnectionHandler.h" 
+#include "../include/StompClient.h" 
 
 
 int main(int argc, char *argv[]) {
@@ -12,10 +11,10 @@ int main(int argc, char *argv[]) {
 	StompProtocol protocol;  
 
     // Start the keyboard listening thread
-    std::thread keyboardThread(handleKeyboard, std::ref(protocol), handlerPtr);
+    std::thread keyboardThread(StompClient::handleKeyboard, std::ref(protocol), handlerPtr);
 
     // Start the server listening thread
-    std::thread serverThread(handleServer, std::ref(protocol), handlerPtr);
+    std::thread serverThread(StompClient::handleServer, std::ref(protocol), handlerPtr);
 
     keyboardThread.join();
 
@@ -27,7 +26,7 @@ int main(int argc, char *argv[]) {
 }
 
 // Function to handle keyboard input
-void handleKeyboard(StompProtocol& protocol, ConnectionHandler* handlerPtr) {
+void StompClient::handleKeyboard(StompProtocol& protocol, ConnectionHandler* handlerPtr) {
     std::string line;
     while (!protocol.shouldTerminateKeybord()) {
         std::getline(std::cin, line);
@@ -38,7 +37,7 @@ void handleKeyboard(StompProtocol& protocol, ConnectionHandler* handlerPtr) {
 }
 
 // Function to handle server responses
-void handleServer(StompProtocol& protocol,ConnectionHandler* handlerPtr) {
+void StompClient::handleServer(StompProtocol& protocol,ConnectionHandler* handlerPtr) {
     if(handlerPtr != nullptr){
 		while (!protocol.shouldTerminateServer()) {
 			string frameStr;
@@ -51,7 +50,7 @@ void handleServer(StompProtocol& protocol,ConnectionHandler* handlerPtr) {
 	}
 }
 
-StompFrame parseStompFrame(const std::string& rawFrame) {
+StompFrame StompClient::parseStompFrame(const std::string& rawFrame) {
     StompFrame frame;
     
     // Split the raw frame into header/command part and body part

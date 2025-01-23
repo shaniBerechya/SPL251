@@ -42,10 +42,7 @@ private:
     vector<string> split(const string &str, char delim);
     int generateSubscriptionId();
     int findIndex(vector<string>& v, string val);
-    std::string epochToDate(time_t epoch) {
-
-
-
+    std::string epochToDate(time_t epoch);
 
 public:
     StompProtocol();

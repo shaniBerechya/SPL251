@@ -176,9 +176,7 @@ public class StompMessagingProtocolImpl implements StompMessagingProtocol<StompF
                 "Did not contain a destination header which is REQUIRED for message propagation.");
         }
         //removing the '/' from destination
-        boolean ourClaint = true;
         if (destination.startsWith("/")) {
-            ourClaint = false;
             destination = destination.substring(1);
         }
         //case 2: frameBody is null

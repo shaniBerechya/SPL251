@@ -84,8 +84,19 @@ StompProtocol::~StompProtocol(){}
   
         string sender = event.get_eventOwnerUser();
 
-       // Update the event map
-        eventsMap[channelName].push_back(event);
+       // Update the event map and keep the list sorted
+        std::vector<Event>& eventList = eventsMap[channelName];
+
+        // Find the correct position to insert the new event
+        auto it = std::lower_bound(eventList.begin(), eventList.end(), event, [](const Event& a, const Event& b) {
+            if (a.get_date_time() != b.get_date_time()) {
+                return a.get_date_time() < b.get_date_time(); // Sort by date first
+            }
+            return a.get_name() < b.get_name(); // Then lexicographically by name
+        });
+
+        // Insert the new event at the correct position
+        eventList.insert(it, event);
 
         std::cout << "Processed message from " << sender << " in channel " << channelName << std::endl;
     }
@@ -291,9 +302,80 @@ StompProtocol::~StompProtocol(){}
 
     }
 
-    void StompProtocol::summaryHendel(vector<string>& lineCommands){
+    void StompProtocol::summaryHendel(vector<string>& lineCommands) {
+        if (lineCommands.size() != 4) {
+            std::cout << "Usage: summary {output_file_path}" << std::endl;
+            return;
+        }
+
+        std::string outputFilePath = lineCommands[1];
+        std::ofstream outputFile(outputFilePath);
+
+        if (!outputFile.is_open()) {
+            std::cerr << "Error: Could not open file " << outputFilePath << " for writing." << std::endl;
+            return;
+        }
+
+        string user = lineCommands[2];
+        string channelName = lineCommands[1];
+        vector<Event> events = eventsMap[channelName];
+
+         // Calculate stats
+        int totalReports = 0;
+        int activeReports = 0;
+        int forcesArrivalCount = 0;
+
+        for (Event event : events) {
+            //we only wany event send by specipic user
+            if(event.get_eventOwnerUser() == user){
+               //updata stats
+               totalReports++;
+               if (event.isActive()) { 
+                    activeReports++;
+                }
+                if (event.forcesArrivalAtScene()) { 
+                    forcesArrivalCount++;
+                }
+
+                // Write channel summary
+                outputFile << "Channel " << channelName << "\n";
+                outputFile << "Stats:\n";
+                outputFile << "Total: " << totalReports << "\n";
+                outputFile << "Active: " << activeReports << "\n";
+                outputFile << "Forces arrival at scene: " << forcesArrivalCount << "\n\n";
+
+                outputFile << "Report_" << (totalReports) << ":\n";
+                outputFile << "city: " << event.get_city() << "\n"; 
+                outputFile << "date time: " << epochToDate(event.get_date_time()) << "\n"; 
+                outputFile << "event name: " << event.get_name() << "\n"; 
+                string summry;
+                if(event.get_description().size() > 27){
+                    summry = event.get_description().substr(0,26) + "...";
+                }
+                else{
+                    summry = event.get_description();
+                }
+                
+                outputFile << "summary: " << summry << "\n\n"; 
+            }  
+        }
+
         
+
+        outputFile.close();
+        std::cout << "Summary written to " << outputFilePath << std::endl;
     }
+
+    std::string StompProtocol::epochToDate(time_t epoch) {
+        // Convert epoch time to tm structure
+        std::tm tm = *std::localtime(&epoch);
+
+        // Format the date and time as "dd/MM/yy HH:mm"
+        std::ostringstream oss;
+        oss << std::put_time(&tm, "%d/%m/%y %H:%M");
+        return oss.str();
+    }
+
 
     int StompProtocol::findIndex(vector<string>& v, string val) {
         for (int i = 0; i < v.size(); i++) {

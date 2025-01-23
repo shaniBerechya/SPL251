@@ -66,9 +66,29 @@ const std::string &Event::get_eventOwnerUser() const{
 }
 
 const std::string Event::getBodyFromEvent() const{
-
+    std::ostringstream body;
+    
+    body << "user: " << eventOwnerUser << "\n";
+    body << "city: " << city << "\n";
+    body << "event name: " << name << "\n";
+    body << "date time: " << date_time << "\n";
+    body << "general information:\n";
+    for (const auto& [key, value] : general_information) {
+        body << "    " << key << ": " << value << "\n"; // Indent each general information entry
+    }
+    body << "description:\n" << description << "\n";
+    return body.str();
 }
 
+bool Event::isActive() const{
+    bool isActive = general_information.at("active") == "true";
+    return isActive;
+}
+
+bool Event::forcesArrivalAtScene() const{
+    bool isForcesArrivalAtScene = general_information.at("forces_arrival_at_scene") == "true";
+    return isForcesArrivalAtScene;
+}
 
 Event::Event(const std::string &frame_body): channel_name(""), city(""), 
                                              name(""), date_time(0), description(""), general_information(),

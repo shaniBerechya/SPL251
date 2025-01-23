@@ -36,6 +36,8 @@ public:
     const std::string &get_eventOwnerUser() const;
     int get_date_time() const;
     const std::map<std::string, std::string> &get_general_information() const;
+    bool isActive() const;
+    bool forcesArrivalAtScene() const;
     const std::string getBodyFromEvent() const;
 };
 

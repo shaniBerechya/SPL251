@@ -70,7 +70,8 @@
         "ranges": "cpp",
         "stop_token": "cpp",
         "cinttypes": "cpp",
-        "*.ipp": "cpp"
+        "*.ipp": "cpp",
+        "shared_mutex": "cpp"
     },
     "makefile.makefilePath": "client/",
     "java.configuration.updateBuildConfiguration": "interactive"

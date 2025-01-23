@@ -47,7 +47,7 @@ public class StompMessagingProtocolImpl implements StompMessagingProtocol<StompF
                 connections.disconnect(connectionId);
                 
             }
-            String channel = respond.getHeaderValue("destination").substring(1);
+            String channel = respond.getHeaderValue("destination"); // in case of not our client : .substring(1);
             connections.send(channel, respond);
         }
 
@@ -176,7 +176,9 @@ public class StompMessagingProtocolImpl implements StompMessagingProtocol<StompF
                 "Did not contain a destination header which is REQUIRED for message propagation.");
         }
         //removing the '/' from destination
+        boolean ourClaint = true;
         if (destination.startsWith("/")) {
+            ourClaint = false;
             destination = destination.substring(1);
         }
         //case 2: frameBody is null
@@ -198,7 +200,9 @@ public class StompMessagingProtocolImpl implements StompMessagingProtocol<StompF
         
         int messageID  = dataBase.addMessage(frameBody); //adds the message to the data base
         int subscriptionID = dataBase.getSubscriptionIDForChannel(destination, connectionId);
-        String[] headers = {"subscription: " + subscriptionID,"message-id: " + messageID,"destination:/" + destination};
+        
+
+        String[] headers = {"subscription: " + subscriptionID,"message-id: " + messageID,"destination:" + destination};
         StompFrame respond = new StompFrame("MESSAGE", headers, frameBody);
         return respond;
     }

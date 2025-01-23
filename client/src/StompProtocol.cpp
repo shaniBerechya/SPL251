@@ -193,7 +193,7 @@ StompProtocol::~StompProtocol(){}
         }
 
         // Extract the channel name from the input
-        string channelName = "/"+ lineCommands[1];
+        string channelName = lineCommands[1];
 
         // Generate a subscription ID and a receipt ID
         int subId = generateSubscriptionId();
@@ -220,7 +220,7 @@ StompProtocol::~StompProtocol(){}
 
 
     void StompProtocol::exitHendel(vector<string>& lineCommands, ConnectionHandler* &handlerPtr){
-         string channelName = "/"+ lineCommands[1];
+         string channelName = lineCommands[1];
         // Check if the user is subscribed to the channel
         if (count(channels.begin(), channels.end(), channelName) == 0) {
             std::cerr << "you are not subscribed to channel " + lineCommands[1] << std::endl;

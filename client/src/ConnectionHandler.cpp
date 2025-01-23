@@ -16,6 +16,9 @@ ConnectionHandler::~ConnectionHandler() {
 }
 
 bool ConnectionHandler::connect() {
+    //lock for connection
+    std::lock_guard<std::mutex> lock(mutex_);
+	
 	std::cout << "Starting connect to "
 	          << host_ << ":" << port_ << std::endl;
 	try {
@@ -33,6 +36,8 @@ bool ConnectionHandler::connect() {
 }
 
 bool ConnectionHandler::getBytes(char bytes[], unsigned int bytesToRead) {
+	std::lock_guard<std::mutex> lock(mutex_);//lock
+
 	size_t tmp = 0;
 	boost::system::error_code error;
 	try {
@@ -49,6 +54,8 @@ bool ConnectionHandler::getBytes(char bytes[], unsigned int bytesToRead) {
 }
 
 bool ConnectionHandler::sendBytes(const char bytes[], int bytesToWrite) {
+	std::lock_guard<std::mutex> lock(mutex_);//lock
+
 	int tmp = 0;
 	boost::system::error_code error;
 	try {
@@ -71,7 +78,6 @@ bool ConnectionHandler::getLine(std::string &line) {
 bool ConnectionHandler::sendLine(std::string &line) {
 	return sendFrameAscii(line, '\n');
 }
-
 
 bool ConnectionHandler::getFrameAscii(std::string &frame, char delimiter) {
 	char ch;
@@ -100,6 +106,7 @@ bool ConnectionHandler::sendFrameAscii(const std::string &frame, char delimiter)
 
 // Close down the connection properly.
 void ConnectionHandler::close() {
+	std::lock_guard<std::mutex> lock(mutex_);//lock
 	try {
 		socket_.close();
 	} catch (...) {

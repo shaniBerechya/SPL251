@@ -61,6 +61,15 @@ const std::string &Event::get_description() const
     return this->description;
 }
 
+const std::string &Event::get_eventOwnerUser() const{
+    return eventOwnerUser;
+}
+
+const std::string Event::getBodyFromEvent() const{
+
+}
+
+
 Event::Event(const std::string &frame_body): channel_name(""), city(""), 
                                              name(""), date_time(0), description(""), general_information(),
                                              eventOwnerUser("")
@@ -136,7 +145,6 @@ names_and_events parseEventsFile(std::string json_path)
             else
                 general_information[update.key()] = update.value().dump();
         }
-
         events.push_back(Event(channel_name, city, name, date_time, description, general_information));
     }
     
@@ -151,3 +159,4 @@ void split_str(const std::string& input, char delimiter, std::vector<std::string
         output.push_back(token);
     }
 }
+   

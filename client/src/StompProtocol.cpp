@@ -103,7 +103,7 @@ StompProtocol::~StompProtocol(){}
     }
     
 //Keybord:
-    void StompProtocol::processKeybord(string& line,std::promise<std::shared_ptr<ConnectionHandler>>& promiseHendler) {
+    void StompProtocol::processKeybord(string& line,ConnectionHandler& hendler) {
         vector<string> lineCommands = split(line, ' '); // A utility function split needs to be defined or included before.
         string command = lineCommands[0];
 
@@ -111,25 +111,25 @@ StompProtocol::~StompProtocol(){}
             std::cout << "got commend: login" << std::endl;
 
             // login {host:port} {username} {password}
-            logingHendel(lineCommands, promiseHendler);
+            logingHendel(lineCommands, hendler);
             // Further code to send this frame to the server
         }
         else if(isConnected){
             if (command == "join") {
             // join {channel_name}
-            joinHendel(lineCommands, promiseHendler);
+            joinHendel(lineCommands, hendler);
             // Further code to send this frame to the server
             } else if (command == "exit") {
                 // exit {channel_name}
-                exitHendel(lineCommands, promiseHendler);
+                exitHendel(lineCommands, hendler);
                 // Further code to send this frame to the server
-            } else if (command == "report", hendlerPtr) {
+            } else if (command == "report") {
                 // report {file_name}
-                reportHendel(lineCommands, promiseHendler);
+                reportHendel(lineCommands, hendler);
                 // Further code to send this frame to the server
             } else if (command == "logout") {
                 // logout
-                logoutHendel(promiseHendler);
+                logoutHendel(hendler);
                 // Further code to send this frame to the server
             } else if(command == "summary") {
                 summaryHendel(lineCommands);
@@ -158,7 +158,7 @@ StompProtocol::~StompProtocol(){}
         return tokens;
     }
 
-    void StompProtocol::logingHendel(vector<string>& lineCommands,std::promise<std::shared_ptr<ConnectionHandler>>& promiseHendler ) {
+    void StompProtocol::logingHendel(vector<string>& lineCommands,ConnectionHandler& hendler ) {
         std::cout << "got commend: logingHendel" << std::endl;
 
         if (lineCommands.size() != 4) {
@@ -183,10 +183,10 @@ StompProtocol::~StompProtocol(){}
         int portInt = std::stoi(portStr);  
         short portShort = static_cast<short>(portInt);  
 
-        hendlerPtr = std::make_shared<ConnectionHandler>(host, portShort);
-        promiseHendler.set_value(hendlerPtr);
 
-         if (!hendlerPtr->connect()) {
+        hendler.set(host,portShort);
+
+         if (!hendler.connect()) {
             std::cerr << "Cannot connect to server" << std::endl;
          }
          else{
@@ -203,7 +203,7 @@ StompProtocol::~StompProtocol(){}
             frame.setHeadersByParts("passcode", password);
 
             //sending:
-            hendlerPtr->sendFrameAscii(frame.toString(), '\u0000');
+            hendler.sendFrameAscii(frame.toString(), '\u0000');
             isConnected = true;
             username = userName;
          }
@@ -211,7 +211,7 @@ StompProtocol::~StompProtocol(){}
        
     }
 
-    void StompProtocol::joinHendel(vector<string>& lineCommands, std::promise<std::shared_ptr<ConnectionHandler>>& promiseHendler){
+    void StompProtocol::joinHendel(vector<string>& lineCommands, ConnectionHandler& hendler){
         if (lineCommands.size() != 2) {
             std::cout << "Usage: join {channel_name}" << std::endl;
         }
@@ -231,7 +231,7 @@ StompProtocol::~StompProtocol(){}
 
         cout << "Sending JOIN frame: " << frame.toString() << endl;
          //sending and update data:
-        hendlerPtr->sendFrameAscii(frame.toString(), '\u0000');
+        hendler.sendFrameAscii(frame.toString(), '\u0000');
         channels[subId] = (channelName);
         reciepts[receiptId] =("Joined channel " + lineCommands[1]);
     }
@@ -243,7 +243,7 @@ StompProtocol::~StompProtocol(){}
     }
 
 
-    void StompProtocol::exitHendel(vector<string>& lineCommands, std::promise<std::shared_ptr<ConnectionHandler>>& promiseHendler){
+    void StompProtocol::exitHendel(vector<string>& lineCommands, ConnectionHandler& hendler){
          string channelName = lineCommands[1];
         // Check if the user is subscribed to the channel
         if (count(channels.begin(), channels.end(), channelName) == 0) {
@@ -265,11 +265,11 @@ StompProtocol::~StompProtocol(){}
         channels.erase(channels.begin()+subId);
 
         //sending the frame
-        hendlerPtr->sendFrameAscii(frame.toString(), '\u0000');
+        hendler.sendFrameAscii(frame.toString(), '\u0000');
 
     }
 
-    void StompProtocol::reportHendel(vector<string>& lineCommands, std::promise<std::shared_ptr<ConnectionHandler>>& promiseHendler){
+    void StompProtocol::reportHendel(vector<string>& lineCommands, ConnectionHandler& hendler){
         if (lineCommands.size() != 2) {
             cout << "Usage: report {file_path}" << endl;
             return; // Return an empty frame or handle the error appropriately
@@ -291,12 +291,12 @@ StompProtocol::~StompProtocol(){}
             frame.setFrameBody(event.getBodyFromEvent());
 
             // Sending the frame 
-            hendlerPtr->sendFrameAscii(frame.toString(), '\u0000');
+            hendler.sendFrameAscii(frame.toString(), '\u0000');
         }
 
     }
 
-    void StompProtocol::logoutHendel(std::promise<std::shared_ptr<ConnectionHandler>>& promiseHendler){
+    void StompProtocol::logoutHendel(ConnectionHandler& hendler){
         if (!isConnected) {
             std::cout << "please login first" << std::endl;
         }
@@ -311,7 +311,7 @@ StompProtocol::~StompProtocol(){}
         reciepts[receiptId] = "Logged out";
 
         //sending the frame
-        hendlerPtr->sendFrameAscii(frame.toString(), '\u0000');
+        hendler.sendFrameAscii(frame.toString(), '\u0000');
 
     }
 

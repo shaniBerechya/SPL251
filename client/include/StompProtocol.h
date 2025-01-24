@@ -24,15 +24,13 @@ private:
     map<string, vector<Event>> eventsMap;
     vector<string> reciepts;
 
-    std::shared_ptr<ConnectionHandler> hendlerPtr;
-
     //handeling protocol:
     //key bord:
-    void logingHendel(vector<string>& lineCommands, std::promise<std::shared_ptr<ConnectionHandler>>& promiseHendler);
-    void joinHendel(vector<string>& lineCommands,std::promise<std::shared_ptr<ConnectionHandler>>& promiseHendler );
-    void exitHendel(vector<string>& lineCommands, std::promise<std::shared_ptr<ConnectionHandler>>& promiseHendler);
-    void reportHendel(vector<string>& lineCommands, std::promise<std::shared_ptr<ConnectionHandler>>& promiseHendler);
-    void logoutHendel(std::promise<std::shared_ptr<ConnectionHandler>>& promiseHendler);
+    void logingHendel(vector<string>& lineCommands, ConnectionHandler& Hendler);
+    void joinHendel(vector<string>& lineCommands,ConnectionHandler& Hendle );
+    void exitHendel(vector<string>& lineCommands, ConnectionHandler& Hendle);
+    void reportHendel(vector<string>& lineCommands, ConnectionHandler& Hendle);
+    void logoutHendel(ConnectionHandler& Hendle);
     void summaryHendel(vector<string>& lineCommands);
 
     //server:
@@ -55,7 +53,7 @@ public:
     void processServer(StompFrame& frame);
     bool shouldTerminateServer();
     //Keybord:
-    void processKeybord(string& line, std::promise<std::shared_ptr<ConnectionHandler>>& promiseHendler);
+    void processKeybord(string& line, ConnectionHandler& Hendle);
     bool shouldTerminateKeybord();
 
 };

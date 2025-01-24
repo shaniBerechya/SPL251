@@ -9,11 +9,14 @@ using std::endl;
 using std::string;
 
 ConnectionHandler::ConnectionHandler(string host, short port) : host_(host), port_(port), io_service_(),
-                                                                socket_(io_service_),mutex_() {}
+                                                                socket_(io_service_),isConect(false),mutex_() {}
 
 ConnectionHandler::~ConnectionHandler() {
 	close();
 }
+
+ConnectionHandler::ConnectionHandler():
+ConnectionHandler("",0){}
 
 bool ConnectionHandler::connect() {
     //lock for connection
@@ -33,8 +36,13 @@ bool ConnectionHandler::connect() {
 		std::cerr << "Connection failed (Error: " << e.what() << ')' << std::endl;
 		return false;
 	}
+	isConect = true;
 	std::cout << "connected from connection hendler" << std::endl;
 	return true;
+}
+
+bool ConnectionHandler::isConected(){
+	return isConect;
 }
 
 bool ConnectionHandler::getBytes(char bytes[], unsigned int bytesToRead) {
@@ -114,4 +122,10 @@ void ConnectionHandler::close() {
 	} catch (...) {
 		std::cout << "closing failed: connection already closed" << std::endl;
 	}
+	isConect = false;
+}
+
+void ConnectionHandler::set(std::string host, short port){
+	host_ = host;
+	port_ = port;
 }

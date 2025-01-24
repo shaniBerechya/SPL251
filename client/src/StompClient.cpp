@@ -10,15 +10,14 @@
 
 int main(int argc, char *argv[]) {
 	
-    std::promise<std::shared_ptr<ConnectionHandler>> promiseHendler;
-    std::future<std::shared_ptr<ConnectionHandler>> futureHendler = promiseHendler.get_future();
+    ConnectionHandler hendler;
 	StompProtocol protocol;  
 
     // Start the keyboard listening thread
-    std::thread keyboardThread(StompClient::handleKeyboard, std::ref(protocol), std::ref(promiseHendler));
+    std::thread keyboardThread(StompClient::handleKeyboard, std::ref(protocol), std::ref(hendler));
 
     // Start the server listening thread
-    std::thread serverThread(StompClient::handleServer, std::ref(protocol), std::ref(futureHendler));
+    std::thread serverThread(StompClient::handleServer, std::ref(protocol), std::ref(hendler));
 
     keyboardThread.join();
 
@@ -31,38 +30,35 @@ int main(int argc, char *argv[]) {
 
 // Function to handle keyboard input
 void StompClient::handleKeyboard(
-    StompProtocol& protocol, std::promise<std::shared_ptr<ConnectionHandler>>& promiseHendler)
+    StompProtocol& protocol, ConnectionHandler& hendler)
      {
     std::string line;
     while (!protocol.shouldTerminateKeybord()) {
         std::getline(std::cin, line);
         if (line != "") {
-            protocol.processKeybord(line, promiseHendler) ;
+            protocol.processKeybord(line, hendler) ;
         }
     }
 }
 
 // Function to handle server responses
-void StompClient::handleServer(
-   StompProtocol& protocol, std::future<std::shared_ptr<ConnectionHandler>>& futureHendler)
-{
-    // reading to future.get() only once
-    if (futureHendler.valid()) {
-        std::shared_ptr<ConnectionHandler> handlerPtr = futureHendler.get();
-        while (!protocol.shouldTerminateServer()) {
-            if (handlerPtr != nullptr) {
+void StompClient::handleServer(StompProtocol& protocol, ConnectionHandler& hendler){
+    while (!protocol.shouldTerminateKeybord())
+    {
+        if (hendler.isConected()) {
+            while(!protocol.shouldTerminateServer()){
                 std::cout << "handleServer in client main" << std::endl;
                 string frameStr;
-                handlerPtr->getFrameAscii(frameStr, '\u0000');
+                hendler.getFrameAscii(frameStr, '\u0000');
                 StompFrame frame = parseStompFrame(frameStr);
                 std::cout << "frame received from server: \n" << frameStr << std::endl;
                 protocol.processServer(frame);
             }
+            hendler.close();
         }
-        handlerPtr->close();
-    }
+    }   
+}
 
-    }
 		
 
 

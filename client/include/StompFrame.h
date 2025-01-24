@@ -13,7 +13,7 @@ using std::vector;
 class StompFrame
 {
 private:
-    string command;  // יש לוודא שימוש ב- std::string
+    string command; 
     map<string,string> headers;
     string frameBody;
 public:

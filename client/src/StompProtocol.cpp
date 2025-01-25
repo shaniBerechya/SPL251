@@ -317,7 +317,7 @@ StompProtocol::~StompProtocol(){}
 
     }
 
-    void StompProtocol::summaryHendel(vector<string>& lineCommands) {
+   void StompProtocol::summaryHendel(std::vector<std::string>& lineCommands) {
         if (lineCommands.size() != 4) {
             std::cout << "Usage: summary {output_file_path}" << std::endl;
             return;
@@ -331,57 +331,57 @@ StompProtocol::~StompProtocol(){}
             return;
         } 
 
-        string user = lineCommands[2];
-        string channelName = lineCommands[1];
-        vector<Event> events = eventsMap[channelName];
+        std::string user = lineCommands[2];
+        std::string channelName = lineCommands[1];
+        std::vector<Event> events = eventsMap[channelName];
 
-         // Calculate stats
+        // Calculate stats
         int totalReports = 0;
         int activeReports = 0;
         int forcesArrivalCount = 0;
+        std::vector<std::string> eventDetails; // To store event details for later output
 
-        for (Event event : events) {
-            //we only wany event send by specipic user
-            cout << "event sendr:" << event.get_eventOwnerUser() << endl;
-            if(event.get_eventOwnerUser() == user){
-                cout << " in the proses of wrting " << endl;
-               //updata stats
-               totalReports++;
-               if (event.isActive()) { 
+        for (Event& event : events) {
+            if(event.get_eventOwnerUser() == user) {
+                totalReports++;
+                if (event.isActive()) { 
                     activeReports++;
                 }
                 if (event.forcesArrivalAtScene()) { 
                     forcesArrivalCount++;
                 }
 
-                // Write channel summary
-                outputFile << "Channel " << channelName << "\n";
-                outputFile << "Stats:\n";
-                outputFile << "Total: " << totalReports << "\n";
-                outputFile << "Active: " << activeReports << "\n";
-                outputFile << "Forces arrival at scene: " << forcesArrivalCount << "\n\n";
-
-                outputFile << "Report_" << (totalReports) << ":\n";
-                outputFile << "city: " << event.get_city() << "\n"; 
-                outputFile << "date time: " << epochToDate(event.get_date_time()) << "\n"; 
-                outputFile << "event name: " << event.get_name() << "\n"; 
-                string summry;
-                if(event.get_description().size() > 27){
-                    summry = event.get_description().substr(0,26) + "...";
+                // Collect event details
+                std::stringstream eventStream;
+                eventStream << "Report_" << totalReports << ":\n";
+                eventStream << "city: " << event.get_city() << "\n";
+                eventStream << "date time: " << epochToDate(event.get_date_time()) << "\n"; 
+                eventStream << "event name: " << event.get_name() << "\n"; 
+                std::string summary = event.get_description();
+                if(summary.size() > 27){
+                    summary = summary.substr(0,26) + "...";
                 }
-                else{
-                    summry = event.get_description();
-                }
-                
-                outputFile << "summary: " << summry << "\n\n"; 
+                eventStream << "summary: " << summary << "\n\n";
+                eventDetails.push_back(eventStream.str());
             }  
         }
 
-        
+        // Write channel and stats summary
+        outputFile << "Channel " << channelName << "\n";
+        outputFile << "Stats:\n";
+        outputFile << "Total: " << totalReports << "\n";
+        outputFile << "active: " << activeReports << "\n";
+        outputFile << "forces arrival at scene: " << forcesArrivalCount << "\n\n";
+
+        outputFile << "Event Reports:\n";
+        for (const auto& detail : eventDetails) {
+            outputFile << detail;
+        }
 
         outputFile.close();
         std::cout << "Summary written to " << outputFilePath << std::endl;
-    }
+}
+
 
     std::string StompProtocol::epochToDate(time_t epoch) {
         // Convert epoch time to tm structure

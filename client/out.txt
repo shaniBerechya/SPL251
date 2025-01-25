@@ -1,20 +1,15 @@
 Channel police
 Stats:
-Total: 1
-Active: 1
-Forces arrival at scene: 1
+Total: 7
+active: 5
+forces arrival at scene: 4
 
+Event Reports:
 Report_1:
 city: Raccoon City
 date time: 23/12/24 07:45
 event name: Burglary
 summary: Suspect broke into a resid...
-
-Channel police
-Stats:
-Total: 2
-Active: 2
-Forces arrival at scene: 1
 
 Report_2:
 city: Liberty City
@@ -22,23 +17,11 @@ date time: 23/12/24 13:40
 event name: Grand Theft Auto
 summary: Pink Lampadati Felon with ...
 
-Channel police
-Stats:
-Total: 3
-Active: 3
-Forces arrival at scene: 2
-
 Report_3:
 city: Vice City
 date time: 24/12/24 02:20
 event name: Hit and Run
 summary: Black SUV struck a pedestr...
-
-Channel police
-Stats:
-Total: 4
-Active: 4
-Forces arrival at scene: 3
 
 Report_4:
 city: Silent Hill
@@ -46,35 +29,17 @@ date time: 24/12/24 22:15
 event name: Armed Robbery
 summary: Two masked suspects armed ...
 
-Channel police
-Stats:
-Total: 5
-Active: 5
-Forces arrival at scene: 3
-
 Report_5:
 city: Pallet Town
 date time: 25/12/24 21:30
 event name: Assault
 summary: Male suspect assaulted ano...
 
-Channel police
-Stats:
-Total: 6
-Active: 5
-Forces arrival at scene: 4
-
 Report_6:
 city: Gotham City
 date time: 26/12/24 06:20
 event name: Drug Possession Arrest
 summary: Police apprehended a suspe...
-
-Channel police
-Stats:
-Total: 7
-Active: 5
-Forces arrival at scene: 4
 
 Report_7:
 city: Los Alamos

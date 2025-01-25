@@ -232,13 +232,6 @@ public class StompMessagingProtocolImpl implements StompMessagingProtocol<StompF
                 "Already subscribed", receipt,
                 "You have attempted to subscribe to a channel to which you are already subscribed");
         }
-        //case 3: frame contains frame body
-        if(inputFrame.getFrameBody() != null){
-            return erorGenretor(inputFrame,
-                "Contain frame body",
-                receipt,
-                "Body should be null");
-        }
         
         //Subscribe logic:
         dataBase.addChannelSubscription(destination, connectionId, Integer.valueOf(id));
@@ -313,13 +306,6 @@ public class StompMessagingProtocolImpl implements StompMessagingProtocol<StompF
         return erorGenretor(inputFrame,
             "Missing header", receipt,
             "should contain the 'receipt' headers.");
-        }
-        //case 2: frame contains frame body
-        if(inputFrame.getFrameBody() != null){
-           return erorGenretor(inputFrame,
-               "Contain frame body",
-               receipt,
-               "Body should be null");
         }
         //Disconnect logic:
         dataBase.disconnect(connectionId);

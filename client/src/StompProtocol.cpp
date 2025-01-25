@@ -323,13 +323,13 @@ StompProtocol::~StompProtocol(){}
             return;
         }
 
-        std::string outputFilePath = lineCommands[1];
+        std::string outputFilePath = "./" + lineCommands[3];
         std::ofstream outputFile(outputFilePath);
 
         if (!outputFile.is_open()) {
             std::cerr << "Error: Could not open file " << outputFilePath << " for writing." << std::endl;
             return;
-        }
+        } 
 
         string user = lineCommands[2];
         string channelName = lineCommands[1];
@@ -342,7 +342,9 @@ StompProtocol::~StompProtocol(){}
 
         for (Event event : events) {
             //we only wany event send by specipic user
+            cout << "event sendr: " << event.get_eventOwnerUser() << endl;
             if(event.get_eventOwnerUser() == user){
+                cout << " in the proses of wrting " << endl;
                //updata stats
                totalReports++;
                if (event.isActive()) { 
@@ -378,7 +380,6 @@ StompProtocol::~StompProtocol(){}
         
 
         outputFile.close();
-        	cout << "we about to close the hendler line 15 connection hendler" << endl;
         std::cout << "Summary written to " << outputFilePath << std::endl;
     }
 
@@ -401,4 +402,4 @@ StompProtocol::~StompProtocol(){}
             }
         }
         return -1;
-    } 
+    }

@@ -68,10 +68,10 @@ const std::string &Event::get_eventOwnerUser() const{
 const std::string Event::getBodyFromEvent() const{
     std::ostringstream body;
     
-    body << "user: " << eventOwnerUser << "\n";
-    body << "city: " << city << "\n";
-    body << "event name: " << name << "\n";
-    body << "date time: " << date_time << "\n";
+    body << "user:" << eventOwnerUser << "\n";
+    body << "city:" << city << "\n";
+    body << "event name:" << name << "\n";
+    body << "date time:" << date_time << "\n";
     body << "general information:\n";
     for (const auto& entry : general_information) {
         const auto& key = entry.first;

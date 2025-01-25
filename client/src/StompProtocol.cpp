@@ -55,7 +55,7 @@ StompProtocol::~StompProtocol(){}
 
     void StompProtocol::receiptHendel(StompFrame frame){
         int recieptID = stoi(frame.getHeaderByName("receipt-id")); 
-        string toPrint = reciepts[recieptID];
+        string toPrint = reciepts[to_string(recieptID)];
         if(toPrint == "Logged out"){
             isConnected = false;  // Set the client's connection status to false
             isTerminateServer = true;
@@ -198,12 +198,12 @@ StompProtocol::~StompProtocol(){}
             StompFrame frame;
             frame.setCommand("CONNECT");
             frame.setHeadersByParts("accept-version", "1.2");
-            frame.setHeadersByParts("host", host); // Assuming the host includes virtual host functionality
+            frame.setHeadersByParts("host", "stomp.cs.bgu.ac.il"); // Assuming the host includes virtual host functionality
             frame.setHeadersByParts("login", userName);
             frame.setHeadersByParts("passcode", password);
 
             //sending:
-            hendler.sendFrameAscii(frame.toString(), '\u0000');
+            hendler.sendFrameAscii(frame.toString(), '\0');
             isConnected = true;
             username = userName;
          }
@@ -231,9 +231,9 @@ StompProtocol::~StompProtocol(){}
 
         cout << "Sending JOIN frame: " << frame.toString() << endl;
          //sending and update data:
-        hendler.sendFrameAscii(frame.toString(), '\u0000');
-        channels[subId] = (channelName);
-        reciepts[receiptId] =("Joined channel " + lineCommands[1]);
+        hendler.sendFrameAscii(frame.toString(), '\0');
+        channels[to_string(subId)] = (channelName);
+        reciepts[to_string(receiptId)] =("Joined channel " + lineCommands[1]);
     }
 
     // Function definition to create a unique identifier for each subscription
@@ -246,26 +246,28 @@ StompProtocol::~StompProtocol(){}
     void StompProtocol::exitHendel(vector<string>& lineCommands, ConnectionHandler& hendler){
          string channelName = lineCommands[1];
         // Check if the user is subscribed to the channel
-        if (count(channels.begin(), channels.end(), channelName) == 0) {
-            std::cerr << "you are not subscribed to channel " + lineCommands[1] << std::endl;
+        auto it = channels.find(channelName);
+        if (it == channels.end()) {
+            std::cerr << "you are not subscribed to channel " + channelName << std::endl;
+            return;
         }
           
-        int subId = findIndex(channels, channelName); // Get the subscription ID for the channel
+        string subId = it->second; // Get the subscription ID for the channel
         int receiptId = generateSubscriptionId();
 
         StompFrame frame;
         frame.setCommand("UNSUBSCRIBE");
-        frame.setHeadersByParts("id", std::to_string(subId)); // Add 'id' header with the subscription ID
+        frame.setHeadersByParts("id",subId); // Add 'id' header with the subscription ID
         frame.setHeadersByParts("receipt", std::to_string(receiptId));
         
         //add in to reciepts
-        reciepts[receiptId] = "Exited channel " + lineCommands[1];
+        reciepts[to_string(receiptId)] = "Exited channel " + lineCommands[1];
         
         // Once the user exits the channel, remove the subscription from the map
-        channels.erase(channels.begin()+subId);
+        channels.erase(channelName);
 
         //sending the frame
-        hendler.sendFrameAscii(frame.toString(), '\u0000');
+        hendler.sendFrameAscii(frame.toString(), '\0');
 
     }
 
@@ -291,7 +293,7 @@ StompProtocol::~StompProtocol(){}
             frame.setFrameBody(event.getBodyFromEvent());
 
             // Sending the frame 
-            hendler.sendFrameAscii(frame.toString(), '\u0000');
+            hendler.sendFrameAscii(frame.toString(), '\0');
         }
 
     }
@@ -308,10 +310,10 @@ StompProtocol::~StompProtocol(){}
         frame.setHeadersByParts("receipt", std::to_string(receiptId));
 
         // Map the receipt to a specific message to confirm logout upon receipt handling
-        reciepts[receiptId] = "Logged out";
+        reciepts[to_string(receiptId)] = "Logged out";
 
         //sending the frame
-        hendler.sendFrameAscii(frame.toString(), '\u0000');
+        hendler.sendFrameAscii(frame.toString(), '\0');
 
     }
 
@@ -376,6 +378,7 @@ StompProtocol::~StompProtocol(){}
         
 
         outputFile.close();
+        	cout << "we about to close the hendler line 15 connection hendler" << endl;
         std::cout << "Summary written to " << outputFilePath << std::endl;
     }
 
@@ -398,4 +401,4 @@ StompProtocol::~StompProtocol(){}
             }
         }
         return -1;
-    }
+    } 

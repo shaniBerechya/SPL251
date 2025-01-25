@@ -20,9 +20,9 @@ private:
     
     bool isConnected;
     string username;
-    vector<string> channels; 
+    map<string,string> channels; 
     map<string, vector<Event>> eventsMap;
-    vector<string> reciepts;
+    map<string,string> reciepts;
 
     //handeling protocol:
     //key bord:

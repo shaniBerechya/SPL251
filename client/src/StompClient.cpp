@@ -49,11 +49,15 @@ void StompClient::handleServer(StompProtocol& protocol, ConnectionHandler& hendl
             while(!protocol.shouldTerminateServer()){
                 std::cout << "handleServer in client main" << std::endl;
                 string frameStr;
-                hendler.getFrameAscii(frameStr, '\u0000');
-                StompFrame frame = parseStompFrame(frameStr);
-                std::cout << "frame received from server: \n" << frameStr << std::endl;
-                protocol.processServer(frame);
+                hendler.getFrameAscii(frameStr, '\0');
+                if (frameStr != ""){
+                     StompFrame frame = parseStompFrame(frameStr);
+                    std::cout << "frame received from server: \n" << frameStr << std::endl;
+                    protocol.processServer(frame);
+                }
+               
             }
+            cout << "we about to close the hendler line 60 main" << endl;
             hendler.close();
         }
     }   

@@ -12,6 +12,8 @@ ConnectionHandler::ConnectionHandler(string host, short port) : host_(host), por
                                                                 socket_(io_service_),isConect(false),mutex_() {}
 
 ConnectionHandler::~ConnectionHandler() {
+	cout << "we about to close the hendler line 15 connection hendler" << endl;
+
 	close();
 }
 
@@ -19,8 +21,6 @@ ConnectionHandler::ConnectionHandler():
 ConnectionHandler("",0){}
 
 bool ConnectionHandler::connect() {
-    //lock for connection
-    std::lock_guard<std::mutex> lock(mutex_);
 	
 	std::cout << "Starting connect to "
 	          << host_ << ":" << port_ << std::endl;
@@ -46,7 +46,6 @@ bool ConnectionHandler::isConected(){
 }
 
 bool ConnectionHandler::getBytes(char bytes[], unsigned int bytesToRead) {
-	std::lock_guard<std::mutex> lock(mutex_);//lock
 
 	size_t tmp = 0;
 	boost::system::error_code error;
@@ -64,7 +63,6 @@ bool ConnectionHandler::getBytes(char bytes[], unsigned int bytesToRead) {
 }
 
 bool ConnectionHandler::sendBytes(const char bytes[], int bytesToWrite) {
-	std::lock_guard<std::mutex> lock(mutex_);//lock
 
 	int tmp = 0;
 	boost::system::error_code error;
@@ -116,12 +114,13 @@ bool ConnectionHandler::sendFrameAscii(const std::string &frame, char delimiter)
 
 // Close down the connection properly.
 void ConnectionHandler::close() {
-	std::lock_guard<std::mutex> lock(mutex_);//lock
 	try {
 		socket_.close();
 	} catch (...) {
 		std::cout << "closing failed: connection already closed" << std::endl;
 	}
+		cout << "we about to close the hendler line 122 connection hendler" << endl;
+
 	isConect = false;
 }
 

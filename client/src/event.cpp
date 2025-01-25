@@ -76,7 +76,7 @@ const std::string Event::getBodyFromEvent() const{
     for (const auto& entry : general_information) {
         const auto& key = entry.first;
         const auto& value = entry.second;
-        body << "    " << key << ": " << value << "\n"; // Indent each general information entry
+        body << "\t" << key << ":" << value << "\n"; // Indent each general information entry
     }
 
     body << "description:\n" << description << "\n";
@@ -84,7 +84,7 @@ const std::string Event::getBodyFromEvent() const{
 }
 
 bool Event::isActive() const{
-    bool isActive = general_information.at("active") == "true";
+    bool isActive = general_information.find("active") != general_information.end() && general_information.at("active") == "true";
     return isActive;
 }
 

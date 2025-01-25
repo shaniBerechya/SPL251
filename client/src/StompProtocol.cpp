@@ -342,7 +342,7 @@ StompProtocol::~StompProtocol(){}
 
         for (Event event : events) {
             //we only wany event send by specipic user
-            cout << "event sendr: " << event.get_eventOwnerUser() << endl;
+            cout << "event sendr:" << event.get_eventOwnerUser() << endl;
             if(event.get_eventOwnerUser() == user){
                 cout << " in the proses of wrting " << endl;
                //updata stats

@@ -234,7 +234,7 @@ StompProtocol::~StompProtocol(){}
         cout << "Sending JOIN frame: " << frame.toString() << endl;
          //sending and update data:
         hendler.sendFrameAscii(frame.toString(), '\0');
-        channels[to_string(subId)] = (channelName);
+        channels[channelName] = to_string(subId);
         reciepts[to_string(receiptId)] =("Joined channel " + lineCommands[1]);
     }
 

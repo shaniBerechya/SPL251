@@ -12,8 +12,6 @@ ConnectionHandler::ConnectionHandler(string host, short port) : host_(host), por
                                                                 socket_(io_service_),isConect(false),mutex_() {}
 
 ConnectionHandler::~ConnectionHandler() {
-	cout << "we about to close the hendler line 15 connection hendler" << endl;
-
 	close();
 }
 
@@ -115,7 +113,6 @@ void ConnectionHandler::close() {
 	} catch (...) {
 		std::cout << "closing failed: connection already closed" << std::endl;
 	}
-	std::cout << "closing the socket" << std::endl;
 	isConect = false;
 }
 

@@ -100,8 +100,6 @@ StompProtocol::~StompProtocol(){}
 
         // Insert the new event at the correct position
         eventList.insert(it, event);
-
-        std::cout << "Processed message from " << sender << " in channel " << channelName << std::endl;
     }
     
 //Keybord:
@@ -110,8 +108,6 @@ StompProtocol::~StompProtocol(){}
         string command = lineCommands[0];
 
         if (command == "login") {
-            std::cout << "got commend: login" << std::endl;
-
             // login {host:port} {username} {password}
             logingHendel(lineCommands, hendler);
             // Further code to send this frame to the server
@@ -161,7 +157,6 @@ StompProtocol::~StompProtocol(){}
     }
 
     void StompProtocol::logingHendel(vector<string>& lineCommands,ConnectionHandler& hendler ) {
-        std::cout << "got commend: logingHendel" << std::endl;
 
         if (lineCommands.size() != 4) {
             std::cout << "Usage: login {host:port} {username} {password}" << std::endl;
@@ -231,7 +226,6 @@ StompProtocol::~StompProtocol(){}
         frame.setHeadersByParts("id", std::to_string(subId));
         frame.setHeadersByParts("receipt", std::to_string(receiptId));
 
-        cout << "Sending JOIN frame: " << frame.toString() << endl;
          //sending and update data:
         hendler.sendFrameAscii(frame.toString(), '\0');
         channels[channelName] = to_string(subId);

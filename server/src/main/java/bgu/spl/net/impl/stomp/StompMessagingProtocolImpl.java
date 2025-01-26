@@ -270,13 +270,6 @@ public class StompMessagingProtocolImpl implements StompMessagingProtocol<StompF
                 receipt,
                 "Never subscribed to a channel with this id");
         }
-        //case 3: frame contains frame body
-        if(inputFrame.getFrameBody() != null){
-            return erorGenretor(inputFrame,
-                "Contain frame body",
-                receipt,
-                "Body should be null");
-        }
 
         //unsubscribe logic:
         String channel = dataBase.getChannel(connectionId, Integer.valueOf(id));

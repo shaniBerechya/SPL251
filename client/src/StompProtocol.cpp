@@ -74,6 +74,7 @@ StompProtocol::~StompProtocol(){}
         std::cout << "ERROR FROM THE SERVER: \n" + frame.toString()<< std::endl;
         isTerminateServer = true;
         isTerminate = true;
+        isConnected = false;
     }
 
     void StompProtocol::messageHendel(StompFrame frame) {

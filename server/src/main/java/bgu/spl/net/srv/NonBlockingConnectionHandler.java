@@ -46,7 +46,7 @@ public class NonBlockingConnectionHandler<T> implements ConnectionHandler<T> {
             buf.flip();
             return () -> {
                 try {
-                    while (buf.hasRemaining()) {
+                    while (buf.hasRemaining() && !protocol.shouldTerminate()) {
                         T nextMessage = encdec.decodeNextByte(buf.get());
                         if (nextMessage != null) {
                             //Inside the process Method we gonna use send method

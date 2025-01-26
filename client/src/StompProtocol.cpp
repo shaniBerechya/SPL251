@@ -23,7 +23,7 @@ isTerminateServer(false),isTerminate(false), isConnected(false),username(""),cha
 StompProtocol::~StompProtocol(){}
 
 //server:
-    void StompProtocol::processServer(StompFrame& frame){
+    void StompProtocol::processServer(StompFrame& frame, ConnectionHandler& hendler){
         std::string command = frame.getCommand();
 
         // Check the command type of the frame and handle accordingly
@@ -35,7 +35,7 @@ StompProtocol::~StompProtocol(){}
             messageHendel(frame);
         } else if (command == "RECEIPT") {
             // Handle a RECEIPT command, which acknowledges actions previously sent to the server
-            receiptHendel(frame);
+            receiptHendel(frame, hendler);
         } else if (command == "ERROR") {
             // Handle an ERROR command, which reports an error from the server
             erorHendl(frame);
@@ -53,12 +53,13 @@ StompProtocol::~StompProtocol(){}
         std::cout << "Login successful" << std::endl;
     }
 
-    void StompProtocol::receiptHendel(StompFrame frame){
+    void StompProtocol::receiptHendel(StompFrame frame, ConnectionHandler& hendler){
         int recieptID = stoi(frame.getHeaderByName("receipt-id")); 
         string toPrint = reciepts[to_string(recieptID)];
         if(toPrint == "Logged out"){
             isConnected = false;  // Set the client's connection status to false
             isTerminateServer = true;
+            hendler.close();
         }
         std::cout << toPrint << std::endl;
     }

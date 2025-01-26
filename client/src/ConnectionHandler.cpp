@@ -21,9 +21,6 @@ ConnectionHandler::ConnectionHandler():
 ConnectionHandler("",0){}
 
 bool ConnectionHandler::connect() {
-	
-	std::cout << "Starting connect to "
-	          << host_ << ":" << port_ << std::endl;
 	try {
 		tcp::endpoint endpoint(boost::asio::ip::address::from_string(host_), port_); // the server endpoint
 		boost::system::error_code error;
@@ -37,7 +34,6 @@ bool ConnectionHandler::connect() {
 		return false;
 	}
 	isConect = true;
-	std::cout << "connected from connection hendler" << std::endl;
 	return true;
 }
 
@@ -119,8 +115,7 @@ void ConnectionHandler::close() {
 	} catch (...) {
 		std::cout << "closing failed: connection already closed" << std::endl;
 	}
-		cout << "we about to close the hendler line 122 connection hendler" << endl;
-
+	std::cout << "closing the socket" << std::endl;
 	isConect = false;
 }
 

@@ -15,10 +15,11 @@ class StompProtocol
 {
 private:
     //Fildes:
-    bool isTerminateServer;
-    bool isTerminate;
+    volatile bool isTerminateServer;
+    volatile bool isTerminate;
+
     
-    bool isConnected;
+    volatile bool isConnected;
     string username;
     map<string,string> channels; 
     map<string, vector<Event>> eventsMap;
@@ -34,7 +35,7 @@ private:
     void summaryHendel(vector<string>& lineCommands);
 
     //server:
-    void receiptHendel(StompFrame frame);
+    void receiptHendel(StompFrame frame, ConnectionHandler& hendler);
     void erorHendl(StompFrame frame);
     void messageHendel(StompFrame frame);
     void connectedtHendel(StompFrame frame);
@@ -50,7 +51,7 @@ public:
     StompProtocol();
     ~StompProtocol();
     //server:
-    void processServer(StompFrame& frame);
+    void processServer(StompFrame& frame, ConnectionHandler& hendler);
     bool shouldTerminateServer();
     //Keybord:
     void processKeybord(string& line, ConnectionHandler& Hendle);

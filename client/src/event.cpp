@@ -148,6 +148,10 @@ Event::Event(const std::string &frame_body): channel_name(""), city(""),
 names_and_events parseEventsFile(std::string json_path)
 {
     std::ifstream f(json_path);
+    if (!f.is_open()) {
+        std::cerr << "Invalid path: " << json_path << std::endl;
+        return names_and_events{}; // Return a default-constructed names_and_events object
+    }
     json data = json::parse(f);
 
     std::string channel_name = data["channel_name"];
@@ -175,6 +179,7 @@ names_and_events parseEventsFile(std::string json_path)
 
     return events_and_names;
 }
+
 void split_str(const std::string& input, char delimiter, std::vector<std::string>& output) {
     std::istringstream stream(input);
     std::string token;

@@ -34,35 +34,33 @@ public class StompMessagingProtocolImpl implements StompMessagingProtocol<StompF
 
         // Checks that each command is handled correctly
         else if(commend.equals("CONNECT")){
-            System.out.println("proces: connect");
             StompFrame respond = connectHendel(message);
             sendFrame(respond);
         }
         else if(commend.equals("SEND")){
-            System.out.println("proces: send");
             StompFrame respond = sendHendel(message);
             if (respond.getCommend().equals("ERROR")) {        
+                connections.send(connectionId, respond);
                 isTerminate = true;
                 dataBase.disconnect(connectionId);
                 connections.disconnect(connectionId);
                 
             }
-            String channel = respond.getHeaderValue("destination"); // in case of not our client : .substring(1);
-            connections.send(channel, respond);
+            else{
+                String channel = respond.getHeaderValue("destination"); 
+                connections.send(channel, respond);
+            }      
         }
 
         else if(commend.equals("SUBSCRIBE")){
-            System.out.println("proces: subscribe");
             StompFrame respond = subscribeHendel(message);
             sendFrame(respond);
         }
         else if (commend.equals("UNSUBSCRIBE")){
-            System.out.println("proces: unsbscribe");
             StompFrame respond = unsubscribeHendel(message);
             sendFrame(respond);
         }
         else if (commend.equals("DISCONNECT")){
-            System.out.println("proces: disconect");
             StompFrame respond = disconnectHendel(message);
             sendFrame(respond);
         }

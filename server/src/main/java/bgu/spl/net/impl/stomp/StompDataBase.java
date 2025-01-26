@@ -238,7 +238,10 @@ public class StompDataBase {
     }
 
     public Set<Integer> getSubscribers(String channel){
-        return channels.get(channel);
+        if(channels.containsKey(channel)){
+            return channels.get(channel);
+        }
+        return null;
     }
 
     public boolean getConnectedUsers(int connectionId){

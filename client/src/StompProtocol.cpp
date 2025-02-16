@@ -160,10 +160,12 @@ StompProtocol::~StompProtocol(){}
 
         if (lineCommands.size() != 4) {
             std::cout << "Usage: login {host:port} {username} {password}" << std::endl;
+            return;
         }
 
         if(isConnected){
             std::cout << "The client is already logged in, log out before trying again" << std::endl;
+            return;
         }
 
         // Extracting the host and port
@@ -171,6 +173,7 @@ StompProtocol::~StompProtocol(){}
         size_t colonPos = hostPort.find(':');
         if (colonPos == string::npos) {
             std::cout << "Error: Host and port must be specified as host:port" << std::endl;
+            return;
         }
 
         string host = hostPort.substr(0, colonPos);
@@ -211,6 +214,7 @@ StompProtocol::~StompProtocol(){}
     void StompProtocol::joinHendel(vector<string>& lineCommands, ConnectionHandler& hendler){
         if (lineCommands.size() != 2) {
             std::cout << "Usage: join {channel_name}" << std::endl;
+            return;
         }
         
         // Extract the channel name from the input
@@ -297,6 +301,7 @@ StompProtocol::~StompProtocol(){}
     void StompProtocol::logoutHendel(ConnectionHandler& hendler){
         if (!isConnected) {
             std::cout << "please login first" << std::endl;
+            return;
         }
 
         // Build the DISCONNECT frame
